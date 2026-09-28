@@ -155,6 +155,7 @@ h2{font-size:30px;font-weight:800;margin:44px 0 12px}
     <div class="rule"><strong>Divide by a minus number? Flip the sign!</strong><p>≥ turns into ≤, and &gt; turns into &lt;.</p></div>
     <div class="rule"><strong>Slope is rise over run</strong><p>1/3 means go up 1, then right 3. Like climbing stairs.</p></div>
     <div class="rule"><strong>x = a number is a wall</strong><p>It stands straight up and down, like x = −4 or x = 5.</p></div>
+    <div class="rule"><strong>The zero trick</strong><p>For rules like x + 3y = −6: make x be 0 to find one dot, then make y be 0 to find another dot. Join them!</p></div>
     <div class="rule"><strong>y = a number is a floor</strong><p>It lies flat, side to side, like y = −1 or y = −3.</p></div>
     <div class="rule"><strong>Filled dot or empty dot?</strong><p>≤ or ≥ gets a filled dot (the number counts). &lt; or &gt; gets an empty dot (it doesn't).</p></div>
   </div>
@@ -313,6 +314,74 @@ const LESSONS=[
  {eq:"They cross at <mark>(−4, 6)</mark>",tip:"Look! The lines CROSS. Walk left 4, climb up 6. That's the spot!",p:[[0,-2,P],[-1,0,P],[0,6,G],[5,6,G],[-4,6,'var(--flip)']],L:2,ring:[-4,6]},
  {eq:"−2(−4) − 2 = 8 − 2 = <mark>6</mark> ✓",tip:"Let's check. −2 times −4 is 8. 8 take away 2 is 6. Yes, it works!",p:[[0,-2,P],[-1,0,P],[0,6,G],[5,6,G],[-4,6,'var(--flip)']],L:2,ring:[-4,6]},
  {eq:"Consistent and independent",tip:"They cross at just one spot. One answer: (−4, 6)! ⭐",p:[[0,-2,P],[-1,0,P],[0,6,G],[5,6,G],[-4,6,'var(--flip)']],L:2,ring:[-4,6]}]},
+{name:"Same line: x + 3y = −6",ask:"Graph x + 3y = −6 and y = −⅓x − 2",kind:"gr",lines:[{m:-1/3,b:-2,c:P},{m:-1/3,b:-2,c:G,twin:1}],steps:[
+ {eq:"x + 3y = −6 and y = −⅓x − 2",tip:"The first rule has x and y mixed together. Let's use a cool trick: the ZERO trick!",p:[],L:0},
+ {eq:"<mark>0</mark> + 3y = −6",tip:"Zero trick, part 1: make x be 0. 0 plus something is just that something.",p:[],L:0},
+ {eq:"3y = −6",tip:"So 3 y's make −6.",p:[],L:0},
+ {eq:"y = −6 ÷ 3 = <mark>−2</mark>",tip:"Share −6 into 3 equal groups. Each group gets −2.",p:[],L:0},
+ {eq:"Dot at (0, −2)",tip:"x is 0, so don't walk sideways. Go down 2. Dot!",p:[[0,-2,P]],L:0},
+ {eq:"x + 3(<mark>0</mark>) = −6",tip:"Zero trick, part 2: now make y be 0. 3 times 0 is 0.",p:[[0,-2,P]],L:0},
+ {eq:"x = <mark>−6</mark>",tip:"So x is −6!",p:[[0,-2,P]],L:0},
+ {eq:"Dot at (−6, 0)",tip:"Walk LEFT 6. y is 0, so no climbing. Dot!",p:[[0,-2,P],[-6,0,P]],L:0},
+ {eq:"Join the purple dots",tip:"Join them with a ruler. There's the purple line!",p:[[0,-2,P],[-6,0,P]],L:1},
+ {eq:"y = −⅓(<mark>0</mark>) − 2 = <mark>−2</mark>",tip:"Green rule now. Pick x = 0. ⅓ of 0 is 0. So y is −2. That's the SAME dot as purple!",p:[[0,-2,P],[-6,0,P]],L:1},
+ {eq:"y = −⅓(<mark>−6</mark>) − 2 = 2 − 2 = <mark>0</mark>",tip:"Pick x = −6. Two minus signs make a plus, and ⅓ of 6 is 2. Then 2 − 2 = 0. Same dot again!",p:[[0,-2,P],[-6,0,P]],L:1},
+ {eq:"Green line: same dots",tip:"Same dots means same line. It lands right on top. Twins!",p:[[0,-2,G],[-6,0,G]],L:2},
+ {eq:"Consistent and dependent",tip:"The two rules were the same line in disguise! Answers everywhere. ⭐",p:[[0,-2,G],[-6,0,G]],L:2}]},
+{name:"Tracks: x + y = 5, y = −x − 2",ask:"Graph x + y = 5 and y = −x − 2",kind:"gr",lines:[{m:-1,b:5,c:P},{m:-1,b:-2,c:G}],steps:[
+ {eq:"x + y = 5 and y = −x − 2",tip:"The first rule mixes x and y. Zero trick time!",p:[],L:0},
+ {eq:"<mark>0</mark> + y = 5 → y = <mark>5</mark>",tip:"Make x be 0. 0 + y = 5, so y is 5.",p:[],L:0},
+ {eq:"Dot at (0, 5)",tip:"Don't walk sideways. Climb up 5. Dot!",p:[[0,5,P]],L:0},
+ {eq:"x + <mark>0</mark> = 5 → x = <mark>5</mark>",tip:"Now make y be 0. x + 0 = 5, so x is 5.",p:[[0,5,P]],L:0},
+ {eq:"Dot at (5, 0)",tip:"Walk right 5. No climbing. Dot!",p:[[0,5,P],[5,0,P]],L:0},
+ {eq:"Join the purple dots",tip:"Join them. It goes down like a slide! 🛝",p:[[0,5,P],[5,0,P]],L:1},
+ {eq:"y = −<mark>0</mark> − 2 = <mark>−2</mark>",tip:"Green rule: y = −x − 2. Pick x = 0. So y is −2.",p:[[0,5,P],[5,0,P]],L:1},
+ {eq:"Dot at (0, −2)",tip:"Don't walk sideways. Go down 2. Dot!",p:[[0,5,P],[5,0,P],[0,-2,G]],L:1},
+ {eq:"y = −(<mark>−2</mark>) − 2 = 2 − 2 = <mark>0</mark>",tip:"Pick x = −2. The opposite of −2 is 2. And 2 − 2 = 0.",p:[[0,5,P],[5,0,P],[0,-2,G]],L:1},
+ {eq:"Dot at (−2, 0)",tip:"Walk LEFT 2. No climbing. Dot!",p:[[0,5,P],[5,0,P],[0,-2,G],[-2,0,G]],L:1},
+ {eq:"Join the green dots",tip:"Join them. Look! It leans the same way as purple.",p:[[0,5,P],[5,0,P],[0,-2,G],[-2,0,G]],L:2},
+ {eq:"5 and −2: <mark>7</mark> apart",tip:"From 5 down to −2 is 7 steps. They stay 7 apart forever.",p:[[0,5,P],[5,0,P],[0,-2,G],[-2,0,G]],L:2,gap:[-4, 9, -4, 2, "7 apart"]},
+ {eq:"Inconsistent",tip:"Like train tracks, they never touch. No answer. ⭐ 🚂",p:[[0,5,P],[5,0,P],[0,-2,G],[-2,0,G]],L:2,gap:[-4, 9, -4, 2, "7 apart"]}]},
+{name:"Tracks: x + 2y = 4 and 10",ask:"Graph x + 2y = 4 and x + 2y = 10",kind:"gr",lines:[{m:-0.5,b:2,c:P},{m:-0.5,b:5,c:G}],steps:[
+ {eq:"x + 2y = 4 and x + 2y = 10",tip:"Both start with x + 2y. One says 4, one says 10. Can the same thing be 4 AND 10? Nope! Let's draw and see.",p:[],L:0},
+ {eq:"<mark>0</mark> + 2y = 4 → y = <mark>2</mark>",tip:"Zero trick on purple. Make x be 0. 2 y's make 4, so y is 2.",p:[],L:0},
+ {eq:"Dot at (0, 2)",tip:"Don't walk sideways. Climb up 2. Dot!",p:[[0,2,P]],L:0},
+ {eq:"x + 2(<mark>0</mark>) = 4 → x = <mark>4</mark>",tip:"Make y be 0. 2 times 0 is 0. So x is 4.",p:[[0,2,P]],L:0},
+ {eq:"Dot at (4, 0)",tip:"Walk right 4. No climbing. Dot!",p:[[0,2,P],[4,0,P,"b"]],L:0},
+ {eq:"Join the purple dots",tip:"Join them. There's the purple line!",p:[[0,2,P],[4,0,P,"b"]],L:1},
+ {eq:"<mark>0</mark> + 2y = 10 → y = <mark>5</mark>",tip:"Green now. Make x be 0. 2 y's make 10, so y is 5.",p:[[0,2,P],[4,0,P,"b"]],L:1},
+ {eq:"Dot at (0, 5)",tip:"Don't walk sideways. Climb up 5. Dot!",p:[[0,2,P],[4,0,P,"b"],[0,5,G]],L:1},
+ {eq:"x + 2(<mark>0</mark>) = 10 → x = <mark>10</mark>",tip:"Make y be 0. So x is 10.",p:[[0,2,P],[4,0,P,"b"],[0,5,G]],L:1},
+ {eq:"Dot at (10, 0)",tip:"Walk right 10, all the way to the edge. Dot!",p:[[0,2,P],[4,0,P,"b"],[0,5,G],[10,0,G]],L:1},
+ {eq:"Join the green dots",tip:"Join them. It leans the same way as purple!",p:[[0,2,P],[4,0,P,"b"],[0,5,G],[10,0,G]],L:2},
+ {eq:"2 and 5: <mark>3</mark> apart",tip:"From 2 up to 5 is 3 steps. They stay 3 apart forever.",p:[[0,2,P],[4,0,P,"b"],[0,5,G],[10,0,G]],L:2,gap:[-4, 7, -4, 4, "3 apart"]},
+ {eq:"Inconsistent",tip:"They never touch. No answer. ⭐ 🚂",p:[[0,2,P],[4,0,P,"b"],[0,5,G],[10,0,G]],L:2,gap:[-4, 7, -4, 4, "3 apart"]}]},
+{name:"Same line: x − 4y = 8",ask:"Graph x − 4y = 8 and x − 4y = 8",kind:"gr",lines:[{m:0.25,b:-2,c:P},{m:0.25,b:-2,c:G,twin:1}],steps:[
+ {eq:"x − 4y = 8 and x − 4y = 8",tip:"Look closely... the two rules are exactly the same!",p:[],L:0},
+ {eq:"<mark>0</mark> − 4y = 8",tip:"Zero trick. Make x be 0. So −4y = 8.",p:[],L:0},
+ {eq:"y = 8 ÷ (−4) = <mark>−2</mark>",tip:"Share 8 by −4. That's −2. Sharing by a minus number makes the answer minus.",p:[],L:0},
+ {eq:"Dot at (0, −2)",tip:"Don't walk sideways. Go down 2. Dot!",p:[[0,-2,P]],L:0},
+ {eq:"x − 4(<mark>0</mark>) = 8 → x = <mark>8</mark>",tip:"Make y be 0. 4 times 0 is 0. So x is 8.",p:[[0,-2,P]],L:0},
+ {eq:"Dot at (8, 0)",tip:"Walk right 8. No climbing. Dot!",p:[[0,-2,P],[8,0,P]],L:0},
+ {eq:"Join the purple dots",tip:"Join them. It climbs slowly, like a gentle hill.",p:[[0,-2,P],[8,0,P]],L:1},
+ {eq:"Green line: same dots",tip:"Same rule, same dots, same line. Twins!",p:[[0,-2,G],[8,0,G]],L:2},
+ {eq:"Consistent and dependent",tip:"The lines sit on top of each other. Answers everywhere! ⭐",p:[[0,-2,G],[8,0,G]],L:2}]},
+{name:"Crossing: x + 5y, 2x − 5y",ask:"Graph x + 5y = −5 and 2x − 5y = −10",kind:"gr",lines:[{m:-0.2,b:-1,c:P},{m:0.4,b:2,c:G}],steps:[
+ {eq:"x + 5y = −5 and 2x − 5y = −10",tip:"Two mixed-up rules. Zero trick time for both!",p:[],L:0},
+ {eq:"<mark>0</mark> + 5y = −5 → y = <mark>−1</mark>",tip:"Purple first. Make x be 0. 5 y's make −5, so y is −1.",p:[],L:0},
+ {eq:"Dot at (0, −1)",tip:"Don't walk sideways. Go down 1. Dot!",p:[[0,-1,P]],L:0},
+ {eq:"x + 5(<mark>0</mark>) = −5 → x = <mark>−5</mark>",tip:"Make y be 0. 5 times 0 is 0. So x is −5.",p:[[0,-1,P]],L:0},
+ {eq:"Dot at (−5, 0)",tip:"Walk LEFT 5. No climbing. Dot!",p:[[0,-1,P],[-5,0,P]],L:0},
+ {eq:"Join the purple dots",tip:"Join them. There's the purple line!",p:[[0,-1,P],[-5,0,P]],L:1},
+ {eq:"2(<mark>0</mark>) − 5y = −10",tip:"Green now. Make x be 0. 2 times 0 is 0. So −5y = −10.",p:[[0,-1,P],[-5,0,P]],L:1},
+ {eq:"y = −10 ÷ (−5) = <mark>2</mark>",tip:"Share −10 by −5. Two minus signs make a plus! So y is 2.",p:[[0,-1,P],[-5,0,P]],L:1},
+ {eq:"Dot at (0, 2)",tip:"Don't walk sideways. Climb up 2. Dot!",p:[[0,-1,P],[-5,0,P],[0,2,G]],L:1},
+ {eq:"2x − 5(<mark>0</mark>) = −10 → x = <mark>−5</mark>",tip:"Make y be 0. 2 x's make −10, so x is −5.",p:[[0,-1,P],[-5,0,P],[0,2,G]],L:1},
+ {eq:"Same dot: (−5, 0)!",tip:"Hey! That's the SAME dot purple used: (−5, 0)!",p:[[0,-1,P],[-5,0,P],[0,2,G]],L:1,ring:[-5, 0]},
+ {eq:"Join the green dots",tip:"Join (0, 2) and (−5, 0). The green line goes uphill.",p:[[0,-1,P],[-5,0,P],[0,2,G]],L:2,ring:[-5, 0]},
+ {eq:"They cross at <mark>(−5, 0)</mark>",tip:"The lines cross at just one spot: (−5, 0)!",p:[[0,-1,P],[-5,0,P],[0,2,G]],L:2,ring:[-5, 0]},
+ {eq:"Both rules work ✓",tip:"Let's check both rules. −5 + 5 times 0 is −5 ✓. 2 times −5 is −10 ✓. Both work!",p:[[0,-1,P],[-5,0,P],[0,2,G]],L:2,ring:[-5, 0]},
+ {eq:"Consistent and independent",tip:"They cross once. One answer: (−5, 0)! ⭐",p:[[0,-1,P],[-5,0,P],[0,2,G]],L:2,ring:[-5, 0]}]},
 {name:"Train tracks: 3x − 3, 3x − 8",ask:"Graph y = 3x − 3 and y = 3x − 8",kind:"gr",lines:[{m:3,b:-3,c:G},{m:3,b:-8,c:P}],steps:[
  {eq:"y = <mark>3</mark>x − 3 and y = <mark>3</mark>x − 8",tip:"Both rules have a 3 next to x. That 3 tells how steep the line is.",p:[],L:0},
  {eq:"Same 3 = same steepness",tip:"Same number means both lines lean exactly the same way. Remember that!",p:[],L:0},
@@ -410,7 +479,7 @@ function graph(les,st,anim,prevSt){
   if(x)s+=lbl(gx(x/2),162,'middle',(x>0?'right ':'left ')+Math.abs(x),anim?'fade':'',.2,'var(--flip)');
   if(y){const inside=x>=7||x<0;s+=lbl(gx(x)+(inside?-8:8),gy(y/2)+5,inside?'end':'start',(y>0?'up ':'down ')+Math.abs(y),anim?'fade':'',.7,'var(--flip)')}});
  st.p.forEach(q=>{const[x,y,c,lft]=q,isNew=anim&&!had.includes(x+','+y),cls=isNew?'pop':'';
-  const below=lft==='b',left=!below&&(lft||x<0||x>=7),dy=below?24:y===0?-22:(x===0?5:-10);
+  const below=lft==='b',left=!below&&(lft||x<0||x>=7),dy=below?(y===0?36:24):y===0?-22:(x===0?5:-10);
   s+=`<circle class="${cls}" style="--d:1.1s" cx="${gx(x)}" cy="${gy(y)}" r="8" fill="${c}" stroke="var(--card)" stroke-width="2.5"/>`;
   if(below&&had.includes(x+','+y))return; // tight floors: only name the newest dot
   s+=lbl(gx(x)+(below?0:left?-12:12),gy(y)+dy,below?'middle':left?'end':'start',`(${x}, ${y})`,isNew?'fade':'',1.1)});
