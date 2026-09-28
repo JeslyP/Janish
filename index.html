@@ -128,6 +128,7 @@ h2{font-size:30px;font-weight:800;margin:44px 0 12px}
     <div class="controls">
       <button class="btn talk" id="talk" aria-pressed="false">🔊 Read to me</button>
     </div>
+    <p class="count" id="sound" hidden>No sound? Turn the volume up. On an iPhone or iPad, flip off the silent switch.</p>
   </section>
 
   <h2>Three kinds of line friends</h2>
@@ -488,10 +489,17 @@ function graph(les,st,anim,prevSt){
 
 // read aloud
 const SAY=[[/−/g,' minus '],[/≤/g,' less than or equal to '],[/≥/g,' greater than or equal to '],[/</g,' less than '],[/>/g,' greater than '],[/⅓/g,' one third '],[/÷/g,' divided by '],[/\((-?\d+), (-?\d+)\)/g,' $1 comma $2 '],[/[⭐✓🍎🍪🙃🛝🧱🚂🛏️]/gu,'']];
-function say(t){if(!talk||!('speechSynthesis' in window))return;speechSynthesis.cancel();
- SAY.forEach(([a,b])=>t=t.replace(a,b));const u=new SpeechSynthesisUtterance(t);u.rate=.9;u.pitch=1.1;speechSynthesis.speak(u)}
-if(!('speechSynthesis' in window))$('talk').hidden=true;
-$('talk').onclick=()=>{talk=!talk;$('talk').setAttribute('aria-pressed',talk);if(talk)say(LESSONS[L].steps[i].tip);else speechSynthesis.cancel()};
+const synth=window.speechSynthesis;let voice=null,lastU=null;
+function pickVoice(){const v=synth?synth.getVoices():[];voice=v.find(x=>/^en[-_]US/i.test(x.lang)&&/Samantha|Google US|Aria|Jenny|Zira/i.test(x.name))||v.find(x=>/^en[-_]US/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null}
+if(synth){pickVoice();synth.onvoiceschanged=pickVoice}
+function utter(t){SAY.forEach(([a,b])=>t=t.replace(a,b));const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=.9;u.pitch=1.1;lastU=u;return u}
+// Browsers drop a speak() that comes right after cancel(), so wait a moment when something is already talking
+function say(t){if(!talk||!synth)return;const u=utter(t);
+ if(synth.speaking||synth.pending){synth.cancel();setTimeout(()=>{synth.resume();synth.speak(u)},120)}else{synth.resume();synth.speak(u)}}
+if(!synth)$('talk').hidden=true;
+// Phones only allow speech that starts inside a tap, so the first sentence is spoken right here
+$('talk').onclick=()=>{talk=!talk;$('talk').setAttribute('aria-pressed',talk);$('sound').hidden=!talk;
+ if(talk){synth.cancel();synth.resume();synth.speak(utter(LESSONS[L].steps[i].tip))}else synth.cancel()};
 
 function render(anim){
  const les=LESSONS[L],S=les.steps,st=S[i],eq=$('eq');
