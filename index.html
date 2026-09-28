@@ -128,7 +128,7 @@ h2{font-size:30px;font-weight:800;margin:44px 0 12px}
     <div class="controls">
       <button class="btn talk" id="talk" aria-pressed="false">🔊 Read to me</button>
     </div>
-    <p class="count" id="sound" hidden>No sound? Turn the volume up. On an iPhone or iPad, flip off the silent switch.</p>
+    <p class="count" id="sound" role="status" hidden></p>
   </section>
 
   <h2>Three kinds of line friends</h2>
@@ -160,6 +160,7 @@ h2{font-size:30px;font-weight:800;margin:44px 0 12px}
     <div class="rule"><strong>y = a number is a floor</strong><p>It lies flat, side to side, like y = −1 or y = −3.</p></div>
     <div class="rule"><strong>Filled dot or empty dot?</strong><p>≤ or ≥ gets a filled dot (the number counts). &lt; or &gt; gets an empty dot (it doesn't).</p></div>
   </div>
+  <p class="count">Helper version 4</p>
 </div>
 
 <script>
@@ -489,17 +490,26 @@ function graph(les,st,anim,prevSt){
 
 // read aloud
 const SAY=[[/−/g,' minus '],[/≤/g,' less than or equal to '],[/≥/g,' greater than or equal to '],[/</g,' less than '],[/>/g,' greater than '],[/⅓/g,' one third '],[/÷/g,' divided by '],[/\((-?\d+), (-?\d+)\)/g,' $1 comma $2 '],[/[⭐✓🍎🍪🙃🛝🧱🚂🛏️]/gu,'']];
-const synth=window.speechSynthesis;let voice=null,lastU=null;
-function pickVoice(){const v=synth?synth.getVoices():[];voice=v.find(x=>/^en[-_]US/i.test(x.lang)&&/Samantha|Google US|Aria|Jenny|Zira/i.test(x.name))||v.find(x=>/^en[-_]US/i.test(x.lang))||v.find(x=>/^en/i.test(x.lang))||null}
-if(synth){pickVoice();synth.onvoiceschanged=pickVoice}
-function utter(t){SAY.forEach(([a,b])=>t=t.replace(a,b));const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=.9;u.pitch=1.1;lastU=u;return u}
+const synth='speechSynthesis' in window?window.speechSynthesis:null;let voice=null,lastU=null,startTimer=null;
+// Prefer a voice built into the device: online voices can fail quietly
+function pickVoice(){const v=synth?synth.getVoices().filter(x=>/^en/i.test(x.lang)):[];const local=v.filter(x=>x.localService);
+ voice=local.find(x=>/Samantha|Aria|Jenny|Zira/i.test(x.name))||local.find(x=>/^en[-_]US/i.test(x.lang))||local[0]||v.find(x=>/^en[-_]US/i.test(x.lang))||v[0]||null}
+if(synth){pickVoice();if(synth.addEventListener)synth.addEventListener('voiceschanged',pickVoice);else synth.onvoiceschanged=pickVoice}
+function note(t){const n=$('sound');n.textContent=t;n.hidden=!talk||!t}
+function utter(t){SAY.forEach(([a,b])=>t=t.replace(a,b));const u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(voice)u.voice=voice;u.rate=.9;u.pitch=1.1;
+ u.onstart=()=>{clearTimeout(startTimer);note('🔊 Talking… No sound? Turn the volume up. On an iPhone or iPad, flip off the silent switch.')};
+ u.onerror=e=>{clearTimeout(startTimer);if(e.error!=='interrupted'&&e.error!=='canceled')note(`The voice could not start (${e.error}). Tap 🔊 Read to me off, then on again.`)};
+ lastU=u;return u}
+function speakNow(u){synth.speak(u);if(synth.paused)synth.resume();clearTimeout(startTimer);
+ startTimer=setTimeout(()=>{if(talk&&!synth.speaking)note("The voice didn't start. Tap 🔊 Read to me off, then on again. Still quiet? Try the Chrome or Safari browser.")},2500)}
 // Browsers drop a speak() that comes right after cancel(), so wait a moment when something is already talking
 function say(t){if(!talk||!synth)return;const u=utter(t);
- if(synth.speaking||synth.pending){synth.cancel();setTimeout(()=>{synth.resume();synth.speak(u)},120)}else{synth.resume();synth.speak(u)}}
+ if(synth.speaking||synth.pending){synth.cancel();setTimeout(()=>speakNow(u),150)}else speakNow(u)}
 if(!synth)$('talk').hidden=true;
-// Phones only allow speech that starts inside a tap, so the first sentence is spoken right here
-$('talk').onclick=()=>{talk=!talk;$('talk').setAttribute('aria-pressed',talk);$('sound').hidden=!talk;
- if(talk){synth.cancel();synth.resume();synth.speak(utter(LESSONS[L].steps[i].tip))}else synth.cancel()};
+// Phones only allow speech that starts inside a tap, so the first sentence is spoken right here, with no cancel() first
+$('talk').onclick=()=>{talk=!talk;$('talk').setAttribute('aria-pressed',talk);
+ if(talk){note('Getting the voice ready…');if(synth.speaking||synth.pending)synth.cancel();speakNow(utter(LESSONS[L].steps[i].tip))}
+ else{clearTimeout(startTimer);synth.cancel();note('')}};
 
 function render(anim){
  const les=LESSONS[L],S=les.steps,st=S[i],eq=$('eq');
