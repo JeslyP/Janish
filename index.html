@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Janiah's Math Helper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF5FF; --card:#FFFFFF; --ink:#1F2A5A; --soft:#56608A; --grid:#D3E0F5; --axis:#7D88B5;
+  --grape:#7B5CE0; --mint:#12A07A; --sun:#FFC83D; --sunInk:#5A4300; --flip:#E5484D;
+  --chip:#FFFFFF; --chipOn:#1F2A5A; --chipOnInk:#FFFFFF;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141A33; --card:#1E2548; --ink:#F1F4FF; --soft:#B4BCE0; --grid:#2D3662; --axis:#8C96C8;
+    --grape:#A58BFF; --mint:#3DD6A6; --sun:#FFD25E; --sunInk:#2A2000; --flip:#FF6B6F;
+    --chip:#1E2548; --chipOn:#F1F4FF; --chipOnInk:#141A33;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141A33; --card:#1E2548; --ink:#F1F4FF; --soft:#B4BCE0; --grid:#2D3662; --axis:#8C96C8;
+  --grape:#A58BFF; --mint:#3DD6A6; --sun:#FFD25E; --sunInk:#2A2000; --flip:#FF6B6F;
+  --chip:#1E2548; --chipOn:#F1F4FF; --chipOnInk:#141A33;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:"Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif;font-size:18px;line-height:1.5;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+.wrap{max-width:720px;margin:0 auto;padding:28px 18px 60px}
+h1,h2{font-family:"Baloo 2","Nunito",ui-rounded,system-ui,sans-serif;line-height:1.1;margin:0}
+h1{font-size:clamp(40px,9vw,64px);font-weight:800}
+h2{font-size:30px;font-weight:800;margin:44px 0 12px}
+.hello{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.hello svg{width:92px;height:92px;flex:none}
+.lead{font-size:20px;color:var(--soft);margin:10px 0 0;max-width:34em}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 16px}
+.chip{font:700 16px/1 "Nunito",system-ui,sans-serif;padding:12px 16px;border-radius:999px;border:2.5px solid var(--ink);
+  background:var(--chip);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--chipOn);color:var(--chipOnInk)}
+.chip:focus-visible,.btn:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+.stage{background:var(--card);border:3px solid var(--ink);border-radius:24px;padding:20px 18px;box-shadow:6px 6px 0 var(--ink)}
+.ask{font-size:16px;color:var(--soft);margin:0 0 6px;font-weight:700}
+.eq{font-family:"Baloo 2",system-ui,sans-serif;font-size:clamp(26px,6.5vw,36px);font-weight:700;text-align:center;min-height:52px;
+  transition:opacity .3s,transform .3s}
+.eq.out{opacity:0;transform:translateY(10px)}
+.tip{display:flex;gap:12px;align-items:flex-start;background:var(--sun);color:var(--sunInk);border-radius:18px;padding:12px 16px;
+  font-weight:800;font-size:18px;min-height:74px;margin:10px 0 14px}
+.tip span.face{font-size:28px;line-height:1}
+.flipper{display:inline-block;color:var(--flip);transition:transform .45s}
+.pic{width:100%;display:block;margin:0 auto;max-width:420px}
+.dots{display:flex;gap:6px;justify-content:center;margin:14px 0 4px;flex-wrap:wrap}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--grid);display:block}
+.dots i.on{background:var(--ink)}
+.controls{display:flex;gap:10px;justify-content:center;margin-top:12px}
+.btn{font:800 18px/1 "Nunito",system-ui,sans-serif;padding:14px 20px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--card);color:var(--ink);cursor:pointer;min-width:92px}
+.btn.go{background:var(--ink);color:var(--card)}
+.btn:disabled{opacity:.35;cursor:default}
+.kinds{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.kind{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:14px 16px}
+.kind svg{width:100%;height:110px;display:block}
+.kind h3{font-family:"Baloo 2",system-ui,sans-serif;font-size:22px;margin:6px 0 2px}
+.kind p{margin:0;color:var(--soft);font-size:16px}
+.kind b{color:var(--ink)}
+.rules{background:var(--card);border:3px solid var(--ink);border-radius:20px;padding:6px 18px}
+.rule{padding:14px 0;border-bottom:2px dashed var(--grid)}
+.rule:last-child{border-bottom:0}
+.rule strong{font-family:"Baloo 2",system-ui,sans-serif;font-size:21px;display:block}
+.rule p{margin:2px 0 0;color:var(--soft)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hello">
+    <svg viewBox="0 0 92 92" aria-hidden="true">
+      <rect x="3" y="3" width="86" height="86" rx="20" fill="var(--sun)" stroke="var(--ink)" stroke-width="3"/>
+      <line x1="16" y1="72" x2="76" y2="20" stroke="var(--grape)" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="16" cy="72" r="7" fill="var(--mint)" stroke="var(--ink)" stroke-width="2.5"/>
+      <circle cx="76" cy="20" r="7" fill="var(--mint)" stroke="var(--ink)" stroke-width="2.5"/>
+    </svg>
+    <div>
+      <h1>Hi Janiah!</h1>
+      <p class="lead">Let's solve these one tiny step at a time. Pick a problem, then press Next.</p>
+    </div>
+  </header>
+
+  <nav class="chips" id="chips" aria-label="Pick a problem"></nav>
+
+  <section class="stage" aria-live="polite">
+    <p class="ask" id="ask"></p>
+    <div class="eq" id="eq"></div>
+    <div class="tip"><span class="face" aria-hidden="true">💡</span><div id="tip"></div></div>
+    <svg class="pic" id="pic" role="img" aria-label="Picture for this step"></svg>
+    <div class="dots" id="dots" aria-hidden="true"></div>
+    <div class="controls">
+      <button class="btn" id="back">Back</button>
+      <button class="btn" id="play">Play</button>
+      <button class="btn go" id="next">Next</button>
+    </div>
+  </section>
+
+  <h2>Three kinds of line friends</h2>
+  <div class="kinds">
+    <div class="kind">
+      <svg viewBox="0 0 200 110" aria-hidden="true"><line x1="20" y1="95" x2="180" y2="15" stroke="var(--grape)" stroke-width="6" stroke-linecap="round"/><line x1="20" y1="15" x2="180" y2="95" stroke="var(--mint)" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="55" r="9" fill="var(--sun)" stroke="var(--ink)" stroke-width="3"/></svg>
+      <h3>They cross once</h3>
+      <p>Two roads that meet at one spot. <b>One answer.</b><br>Called: consistent and independent.</p>
+    </div>
+    <div class="kind">
+      <svg viewBox="0 0 200 110" aria-hidden="true"><line x1="20" y1="80" x2="150" y2="15" stroke="var(--grape)" stroke-width="6" stroke-linecap="round"/><line x1="50" y1="100" x2="180" y2="35" stroke="var(--mint)" stroke-width="6" stroke-linecap="round"/></svg>
+      <h3>They never touch</h3>
+      <p>Like train tracks, side by side forever. <b>No answer.</b><br>Called: inconsistent.</p>
+    </div>
+    <div class="kind">
+      <svg viewBox="0 0 200 110" aria-hidden="true"><line x1="20" y1="95" x2="180" y2="15" stroke="var(--grape)" stroke-width="10" stroke-linecap="round"/><line x1="20" y1="95" x2="180" y2="15" stroke="var(--mint)" stroke-width="4" stroke-dasharray="10 8" stroke-linecap="round"/></svg>
+      <h3>They're twins</h3>
+      <p>The same line sitting on top of itself. <b>Answers everywhere.</b><br>Called: consistent and dependent.</p>
+    </div>
+  </div>
+
+  <h2>Magic rules to remember</h2>
+  <div class="rules">
+    <div class="rule"><strong>Minus outside brackets flips the signs inside</strong><p>−(5 − 3x) turns into −5 + 3x.</p></div>
+    <div class="rule"><strong>Divide by a minus number? Flip the sign!</strong><p>≥ turns into ≤, and &gt; turns into &lt;.</p></div>
+    <div class="rule"><strong>Slope is rise over run</strong><p>1/3 means go up 1, then right 3. Like climbing stairs.</p></div>
+    <div class="rule"><strong>x = a number is a wall</strong><p>It stands straight up and down. y = a number lies flat like a floor.</p></div>
+    <div class="rule"><strong>Filled dot or empty dot?</strong><p>≤ or ≥ gets a filled dot (the number counts). &lt; or &gt; gets an empty dot (it doesn't).</p></div>
+  </div>
+</div>
+
+<script>
+const P='var(--grape)',G='var(--mint)';
+const LESSONS=[
+{name:"Problem 13",ask:"Which graph shows x − (5 − 3x) ≤ 2x − 1?",kind:"nl",steps:[
+ {eq:"x − (5 − 3x) ≤ 2x − 1",tip:"Here's our puzzle. We want x all by itself.",r:[]},
+ {eq:"x − 5 + 3x ≤ 2x − 1",tip:"The minus outside the brackets is a flipper. It flips the signs inside!",r:[]},
+ {eq:"4x − 5 ≤ 2x − 1",tip:"1 x and 3 more x make 4 x. Put them together.",r:[]},
+ {eq:"2x − 5 ≤ −1",tip:"Take away 2x from both sides. Both sides must stay fair.",r:[]},
+ {eq:"2x ≤ 4",tip:"Add 5 to both sides to get rid of the −5.",r:[]},
+ {eq:"x ≤ 2",tip:"Split 4 into 2 groups: 2. Filled dot on 2, color to the left. Answer A! ⭐",r:[[2,"L",1]]}]},
+{name:"Problem 14",ask:"Solve: 3x − 4 > 5 or 1 − 2x ≥ 7",kind:"nl",steps:[
+ {eq:"3x − 4 > 5",tip:"Two little puzzles! Let's do the first one.",r:[]},
+ {eq:"3x > 9",tip:"Add 4 to both sides.",r:[]},
+ {eq:"x > 3",tip:"9 split into 3 groups is 3. Empty dot on 3, color to the right.",r:[[3,"R",0]]},
+ {eq:"1 − 2x ≥ 7",tip:"Now the second puzzle.",r:[[3,"R",0]]},
+ {eq:"−2x ≥ 6",tip:"Take away 1 from both sides.",r:[[3,"R",0]]},
+ {eq:"x <span class='flipper' id='flipme'>≥</span> −3",tip:"We divide by −2, a minus number. Watch the sign FLIP! That's the golden rule.",r:[[3,"R",0]],flip:1},
+ {eq:"x ≤ −3 or x > 3",tip:"Filled dot on −3 going left, empty dot on 3 going right. Answer A! ⭐",r:[[3,"R",0],[-3,"L",1]]}]},
+{name:"Same line: ⅓x + 6",ask:"Graph y = ⅓x + 6 and y = ⅓x + 6",kind:"gr",lines:[{m:1/3,b:6,c:P},{m:1/3,b:6,c:G,twin:1}],steps:[
+ {eq:"y = ⅓x + 6",tip:"Both equations are exactly the same. Hmm, interesting!",p:[],L:0},
+ {eq:"y = ⅓(3) + 6",tip:"Let's try x = 3. We pick 3 because a third of 3 is easy: it's 1.",p:[],L:0},
+ {eq:"y = 1 + 6 = 7",tip:"So our first dot is (3, 7). Go right 3, up 7.",p:[[3,7,P]],L:0},
+ {eq:"y = ⅓(−3) + 6",tip:"Now try x = −3. A third of −3 is −1.",p:[[3,7,P]],L:0},
+ {eq:"y = −1 + 6 = 5",tip:"Second dot is (−3, 5). Go left 3, up 5.",p:[[3,7,P],[-3,5,P]],L:0},
+ {eq:"Join the dots",tip:"Draw a line through both dots. That's the purple line!",p:[[3,7,P],[-3,5,P]],L:1},
+ {eq:"Green line: same dots",tip:"The green equation is the same, so it lands right on top. Twins!",p:[[3,7,G],[-3,5,G]],L:2},
+ {eq:"Check: crosses at 6 ✓",tip:"The +6 tells us where it crosses the up-and-down line. It does!",p:[[3,7,G],[-3,5,G]],L:2,ring:[0,6]},
+ {eq:"Consistent and dependent",tip:"Same line = answers everywhere. ⭐",p:[[3,7,G],[-3,5,G]],L:2,ring:[0,6]}]},
+{name:"Same line: y = −x",ask:"Graph y = −x and y = −x",kind:"gr",lines:[{m:-1,b:0,c:P},{m:-1,b:0,c:G,twin:1}],steps:[
+ {eq:"y = −x",tip:"y is always the opposite of x. Opposite means switch the sign.",p:[],L:0},
+ {eq:"x = 2 → y = −2",tip:"The opposite of 2 is −2. Dot at (2, −2).",p:[[2,-2,P]],L:0},
+ {eq:"x = −2 → y = 2",tip:"The opposite of −2 is 2. Dot at (−2, 2).",p:[[2,-2,P],[-2,2,P]],L:0},
+ {eq:"Join the dots",tip:"The line slides down like a slide at the park.",p:[[2,-2,P],[-2,2,P]],L:1},
+ {eq:"Green line: same dots",tip:"Same equation, same line. Twins again!",p:[[2,-2,G],[-2,2,G]],L:2},
+ {eq:"Consistent and dependent",tip:"It goes through (0, 0) and the lines match. ⭐",p:[[2,-2,G],[-2,2,G]],L:2,ring:[0,0]}]},
+{name:"Walls: x = 2, x = 10",ask:"Graph x = 2 and x = 10",kind:"gr",lines:[{vx:2,c:P},{vx:10,c:G}],steps:[
+ {eq:"x = 2 and x = 10",tip:"No y here! So y can be anything. These lines stand up tall like walls.",p:[],L:0},
+ {eq:"x = 2 → (2, 0), (2, 5)",tip:"x must be 2. Pick any y, like 0 and 5.",p:[[2,0,P],[2,5,P]],L:0},
+ {eq:"Draw the wall at 2",tip:"Straight up and down through 2.",p:[[2,0,P],[2,5,P]],L:1},
+ {eq:"x = 10 → (10, 0), (10, 5)",tip:"x must be 10. Pick y = 0 and 5 again.",p:[[2,0,P],[2,5,P],[10,0,G],[10,5,G]],L:1},
+ {eq:"Draw the wall at 10",tip:"Another tall wall, this time at 10.",p:[[2,0,P],[2,5,P],[10,0,G],[10,5,G]],L:2},
+ {eq:"Inconsistent",tip:"The walls are 8 apart and never touch. No answer. ⭐",p:[[2,0,P],[2,5,P],[10,0,G],[10,5,G]],L:2,gap:[2,-4,10,-4,"8 apart"]}]},
+{name:"Train tracks: 3x − 3, 3x − 8",ask:"Graph y = 3x − 3 and y = 3x − 8",kind:"gr",lines:[{m:3,b:-3,c:G},{m:3,b:-8,c:P}],steps:[
+ {eq:"y = 3x − 3 and y = 3x − 8",tip:"Both have 3 in front of x. That means the same steepness.",p:[],L:0},
+ {eq:"y = 3(0) − 3 = −3",tip:"Green line, x = 0: anything times 0 is 0. Dot at (0, −3).",p:[[0,-3,G]],L:0},
+ {eq:"y = 3(2) − 3 = 3",tip:"x = 2: 3 times 2 is 6, take away 3 is 3. Dot at (2, 3).",p:[[0,-3,G],[2,3,G]],L:0},
+ {eq:"Join the green dots",tip:"Up 3, right 1. Like climbing big stairs!",p:[[0,-3,G],[2,3,G]],L:1,rr:[0,-3,1,3]},
+ {eq:"y = 3(0) − 8 = −8",tip:"Purple line, x = 0. Dot at (0, −8).",p:[[0,-3,G],[2,3,G],[0,-8,P]],L:1},
+ {eq:"y = 3(2) − 8 = −2",tip:"x = 2: 6 take away 8 is −2. Dot at (2, −2).",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:1},
+ {eq:"Join the purple dots",tip:"Same steepness as green. They lean the same way.",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:2},
+ {eq:"Inconsistent",tip:"Like train tracks: 5 apart forever, never touching. No answer. ⭐",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:2,gap:[0.35,-3,0.35,-8,"5 apart"]}]}
+];
+
+const $=id=>document.getElementById(id);
+const pic=$('pic');
+let L=0,i=0,timer=null;
+
+// chips
+LESSONS.forEach((l,k)=>{const b=document.createElement('button');b.className='chip';b.textContent=l.name;
+ b.setAttribute('aria-pressed',k===0);b.onclick=()=>pick(k);$('chips').appendChild(b)});
+
+function grow(){requestAnimationFrame(()=>requestAnimationFrame(()=>pic.querySelectorAll('.grow').forEach(e=>e.style.strokeDashoffset=0)))}
+
+// number line
+const NX=v=>30+(v+5)*30;
+function numline(rays,anim){
+ pic.setAttribute('viewBox','0 0 360 80');
+ let s=`<line x1="10" y1="34" x2="350" y2="34" stroke="var(--axis)" stroke-width="2.5"/><path d="M8 34 l10 -6 v12z M352 34 l-10 -6 v12z" fill="var(--axis)"/>`;
+ for(let v=-5;v<=5;v++)s+=`<line x1="${NX(v)}" y1="27" x2="${NX(v)}" y2="41" stroke="var(--axis)" stroke-width="2"/><text x="${NX(v)}" y="64" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)" font-family="Nunito,system-ui">${v}</text>`;
+ rays.forEach((r,j)=>{const x0=NX(r[0]),x1=r[1]==="L"?14:346,len=Math.abs(x1-x0),a=anim&&j===rays.length-1;
+  s+=`<line class="${a?'grow':''}" x1="${x0}" y1="34" x2="${x1}" y2="34" stroke="var(--grape)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${len}" stroke-dashoffset="${a?len:0}" style="transition:stroke-dashoffset 1s ease"/>`;
+  s+=`<circle cx="${x0}" cy="34" r="9" stroke="var(--grape)" stroke-width="4" fill="${r[2]?'var(--grape)':'var(--card)'}"/>`});
+ pic.innerHTML=s;if(anim)grow();
+}
+
+// graph
+const gx=v=>170+v*15,gy=v=>170-v*15;
+function lineEl(l,anim){
+ let x1,y1,x2,y2;
+ if(l.vx!==undefined){x1=x2=gx(l.vx);y1=gy(-10);y2=gy(10)}
+ else{x1=gx(-12);y1=gy(l.m*-12+l.b);x2=gx(12);y2=gy(l.m*12+l.b)}
+ const len=Math.hypot(x2-x1,y2-y1);
+ if(l.twin)return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${l.c}" stroke-width="3.5" stroke-dasharray="9 7" stroke-linecap="round"/>`;
+ return `<line class="${anim?'grow':''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${l.c}" stroke-width="${l.vx!==undefined?5:7}" stroke-linecap="round" stroke-dasharray="${len}" stroke-dashoffset="${anim?len:0}" style="transition:stroke-dashoffset 1.2s ease"/>`;
+}
+function graph(les,st,anim,prevL){
+ pic.setAttribute('viewBox','0 0 340 340');
+ let s='<defs><clipPath id="cp"><rect x="20" y="20" width="300" height="300"/></clipPath></defs>';
+ for(let v=-10;v<=10;v++)s+=`<line x1="${gx(v)}" y1="20" x2="${gx(v)}" y2="320" stroke="var(--grid)" stroke-width="${v%2?1:1.6}"/><line x1="20" y1="${gy(v)}" x2="320" y2="${gy(v)}" stroke="var(--grid)" stroke-width="${v%2?1:1.6}"/>`;
+ s+=`<line x1="20" y1="170" x2="320" y2="170" stroke="var(--axis)" stroke-width="2.5"/><line x1="170" y1="20" x2="170" y2="320" stroke="var(--axis)" stroke-width="2.5"/>`;
+ for(let v=-10;v<=10;v+=2){if(!v)continue;s+=`<text x="${gx(v)}" y="186" text-anchor="middle" font-size="12" font-weight="700" fill="var(--soft)" font-family="Nunito,system-ui">${v}</text><text x="163" y="${gy(v)+4}" text-anchor="end" font-size="12" font-weight="700" fill="var(--soft)" font-family="Nunito,system-ui">${v}</text>`}
+ s+='<g clip-path="url(#cp)">';
+ les.lines.forEach((l,k)=>{if(st.L>k)s+=lineEl(l,anim&&prevL<=k)});
+ s+='</g>';
+ if(st.rr){const[x,y,run,rise]=st.rr;s+=`<path d="M${gx(x)} ${gy(y)} V${gy(y+rise)} H${gx(x+run)}" fill="none" stroke="var(--flip)" stroke-width="3" stroke-dasharray="5 4"/><text x="${gx(x)-8}" y="${gy(y+rise/2)+4}" text-anchor="end" font-size="14" font-weight="800" fill="var(--flip)" font-family="Nunito,system-ui">up ${rise}</text><text x="${gx(x+run/2)}" y="${gy(y+rise)-8}" text-anchor="middle" font-size="14" font-weight="800" fill="var(--flip)" font-family="Nunito,system-ui">right ${run}</text>`}
+ if(st.gap){const[a,b,c,d,t]=st.gap;s+=`<line x1="${gx(a)}" y1="${gy(b)}" x2="${gx(c)}" y2="${gy(d)}" stroke="var(--flip)" stroke-width="3" stroke-dasharray="5 4"/><text x="${a===c?gx(a)+8:gx((a+c)/2)}" y="${a===c?gy((b+d)/2)+5:gy(b)-10}" text-anchor="${a===c?'start':'middle'}" font-size="15" font-weight="800" fill="var(--flip)" font-family="Nunito,system-ui">${t}</text>`}
+ if(st.ring)s+=`<circle cx="${gx(st.ring[0])}" cy="${gy(st.ring[1])}" r="13" fill="none" stroke="var(--flip)" stroke-width="3"/>`;
+ st.p.forEach(q=>{const left=q[0]<=0&&!(q[0]===0&&q[1]<0&&false);
+  s+=`<circle cx="${gx(q[0])}" cy="${gy(q[1])}" r="8" fill="${q[2]}" stroke="var(--card)" stroke-width="2.5"/>`;
+  s+=`<text x="${gx(q[0])+(q[0]<0?-12:12)}" y="${gy(q[1])+(q[0]===0?5:-10)}" text-anchor="${q[0]<0?'end':'start'}" font-size="14" font-weight="800" fill="var(--ink)" font-family="Nunito,system-ui" paint-order="stroke" stroke="var(--card)" stroke-width="4">(${q[0]}, ${q[1]})</text>`});
+ pic.innerHTML=s;if(anim)grow();
+}
+
+function render(anim){
+ const les=LESSONS[L],S=les.steps,st=S[i],eq=$('eq');
+ $('ask').textContent=les.ask;
+ eq.classList.add('out');
+ setTimeout(()=>{eq.innerHTML=st.eq;$('tip').textContent=st.tip;eq.classList.remove('out');
+  if(st.flip)setTimeout(()=>{const f=$('flipme');if(!f)return;f.style.transform='rotateY(90deg) scale(1.4)';setTimeout(()=>{f.textContent='≤';f.style.transform='rotateY(0) scale(1.4)'},230)},900)},anim?200:0);
+ if(les.kind==='nl'){const prev=i>0?S[i-1].r.length:0;numline(st.r,anim&&st.r.length>prev)}
+ else graph(les,st,anim,i>0?S[i-1].L:0);
+ $('dots').innerHTML=S.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('');
+ $('back').disabled=i===0;$('next').disabled=i===S.length-1;
+}
+function stop(){clearInterval(timer);timer=null;$('play').textContent='Play'}
+function pick(k){stop();L=k;i=0;document.querySelectorAll('.chip').forEach((c,j)=>c.setAttribute('aria-pressed',j===k));render(true)}
+$('next').onclick=()=>{if(i<LESSONS[L].steps.length-1){i++;render(true)}};
+$('back').onclick=()=>{stop();if(i>0){i--;render(false)}};
+$('play').onclick=()=>{if(timer){stop();return}
+ if(i>=LESSONS[L].steps.length-1){i=0;render(true)}
+ $('play').textContent='Pause';
+ timer=setInterval(()=>{if(i<LESSONS[L].steps.length-1){i++;render(true)}else stop()},2800)};
+render(false);
+</script>
+</body>
+</html>
