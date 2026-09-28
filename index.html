@@ -77,7 +77,23 @@ h2{font-size:30px;font-weight:800;margin:44px 0 12px}
 .rule:last-child{border-bottom:0}
 .rule strong{font-family:"Baloo 2",system-ui,sans-serif;font-size:21px;display:block}
 .rule p{margin:2px 0 0;color:var(--soft)}
-@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+.count{font-size:14px;font-weight:800;color:var(--soft);text-align:center;margin:8px 0 0}
+.eq mark{background:var(--sun);color:var(--sunInk);border-radius:8px;padding:0 4px;animation:glow 1.1s ease 2}
+.btn.talk[aria-pressed="true"]{background:var(--sun);color:var(--sunInk)}
+.pop{transform-box:fill-box;transform-origin:center;animation:pop .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--d,0s)}
+.fade{animation:fade .4s ease both;animation-delay:var(--d,0s)}
+.drop{animation:drop .7s cubic-bezier(.3,1.4,.5,1) both}
+.wob{transform-box:view-box;transform-origin:180px 50px;animation:wob 1.3s ease .55s both}
+.bobL{animation:bobL 1.3s ease .55s both}
+.bobR{animation:bobR 1.3s ease .55s both}
+@keyframes glow{50%{transform:scale(1.12)}}
+@keyframes pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes fade{0%{opacity:0}100%{opacity:1}}
+@keyframes drop{0%{transform:translateY(-55px);opacity:0}100%{transform:none;opacity:1}}
+@keyframes wob{30%{transform:rotate(-4deg)}65%{transform:rotate(3deg)}100%{transform:none}}
+@keyframes bobL{30%{transform:translateY(6px)}65%{transform:translateY(-5px)}100%{transform:none}}
+@keyframes bobR{30%{transform:translateY(-6px)}65%{transform:translateY(5px)}100%{transform:none}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
@@ -91,7 +107,7 @@ h2{font-size:30px;font-weight:800;margin:44px 0 12px}
     </svg>
     <div>
       <h1>Hi Janiah!</h1>
-      <p class="lead">Let's solve these one tiny step at a time. Pick a problem, then press Next.</p>
+      <p class="lead">Let's solve these one teeny tiny step at a time. Pick a problem, then press Next. Press 🔊 and I'll read each step to you!</p>
     </div>
   </header>
 
@@ -103,10 +119,14 @@ h2{font-size:30px;font-weight:800;margin:44px 0 12px}
     <div class="tip"><span class="face" aria-hidden="true">💡</span><div id="tip"></div></div>
     <svg class="pic" id="pic" role="img" aria-label="Picture for this step"></svg>
     <div class="dots" id="dots" aria-hidden="true"></div>
+    <p class="count" id="count"></p>
     <div class="controls">
       <button class="btn" id="back">Back</button>
       <button class="btn" id="play">Play</button>
       <button class="btn go" id="next">Next</button>
+    </div>
+    <div class="controls">
+      <button class="btn talk" id="talk" aria-pressed="false">🔊 Read to me</button>
     </div>
   </section>
 
@@ -141,60 +161,104 @@ h2{font-size:30px;font-weight:800;margin:44px 0 12px}
 
 <script>
 const P='var(--grape)',G='var(--mint)';
+// Step kinds:
+//  sc:[left, sign, right, action]  -> balance scale picture (both sides must stay fair)
+//  r:[[value, "L"/"R"/"", filled]] -> number line ("" = just the dot)
+//  p:[[x, y, color, labelOnLeft]], L = lines drawn -> graph; new dots get a "walk" from the middle
 const LESSONS=[
 {name:"Problem 13",ask:"Which graph shows x − (5 − 3x) ≤ 2x − 1?",kind:"nl",steps:[
- {eq:"x − (5 − 3x) ≤ 2x − 1",tip:"Here's our puzzle. We want x all by itself.",r:[]},
- {eq:"x − 5 + 3x ≤ 2x − 1",tip:"The minus outside the brackets is a flipper. It flips the signs inside!",r:[]},
- {eq:"4x − 5 ≤ 2x − 1",tip:"1 x and 3 more x make 4 x. Put them together.",r:[]},
- {eq:"2x − 5 ≤ −1",tip:"Take away 2x from both sides. Both sides must stay fair.",r:[]},
- {eq:"2x ≤ 4",tip:"Add 5 to both sides to get rid of the −5.",r:[]},
- {eq:"x ≤ 2",tip:"Split 4 into 2 groups: 2. Filled dot on 2, color to the left. Answer A! ⭐",r:[[2,"L",1]]}]},
+ {eq:"x − (5 − 3x) ≤ 2x − 1",tip:"This is a puzzle! x is a secret number. Our job is to find it.",sc:["x − (5 − 3x)","≤","2x − 1"]},
+ {eq:"x <mark>−(</mark>5 − 3x<mark>)</mark> ≤ 2x − 1",tip:"See the minus right in front of the brackets? It's a flipper! It flips every sign inside.",sc:["x − (5 − 3x)","≤","2x − 1"]},
+ {eq:"x <mark>− 5 + 3x</mark> ≤ 2x − 1",tip:"Plus 5 flips to minus 5. Minus 3x flips to plus 3x. Now the brackets can go away!",sc:["x − 5 + 3x","≤","2x − 1"]},
+ {eq:"<mark>x</mark> − 5 <mark>+ 3x</mark> ≤ 2x − 1",tip:"Let's find the x friends on the left side. There's x and 3x.",sc:["x − 5 + 3x","≤","2x − 1"]},
+ {eq:"<mark>4x</mark> − 5 ≤ 2x − 1",tip:"1 x and 3 more x make 4 x. Just like 1 apple and 3 apples make 4 apples! 🍎",sc:["4x − 5","≤","2x − 1"]},
+ {eq:"4x − 5 <mark>− 2x</mark> ≤ 2x − 1 <mark>− 2x</mark>",tip:"There's x on both sides. Take away 2x from BOTH sides. Both sides must stay fair!",sc:["4x − 5 − 2x","≤","2x − 1 − 2x","− 2x"]},
+ {eq:"<mark>2x</mark> − 5 ≤ <mark>−1</mark>",tip:"4x take away 2x leaves 2x. And 2x take away 2x leaves nothing. Poof!",sc:["2x − 5","≤","−1"]},
+ {eq:"2x − 5 <mark>+ 5</mark> ≤ −1 <mark>+ 5</mark>",tip:"Now let's get rid of the minus 5. Add 5 to both sides.",sc:["2x − 5 + 5","≤","−1 + 5","+ 5"]},
+ {eq:"<mark>2x</mark> ≤ <mark>4</mark>",tip:"Minus 5 and plus 5 cancel out. They make 0! And −1 + 5 = 4.",sc:["2x","≤","4"]},
+ {eq:"2x <mark>÷ 2</mark> ≤ 4 <mark>÷ 2</mark>",tip:"2x means 2 times x. To undo times, we share into 2 equal groups. Do it to both sides!",sc:["2x ÷ 2","≤","4 ÷ 2","÷ 2"]},
+ {eq:"<mark>x ≤ 2</mark>",tip:"We found it! x can be 2, or any number smaller than 2.",sc:["x","≤","2"]},
+ {eq:"x ≤ 2",tip:"Let's draw it! Put a dot on 2. We fill it in because ≤ means 2 counts too.",r:[[2,"",1]]},
+ {eq:"x ≤ 2",tip:"Smaller numbers live on the left. So we color to the left. That's answer A! ⭐",r:[[2,"L",1]]}]},
 {name:"Problem 14",ask:"Solve: 3x − 4 > 5 or 1 − 2x ≥ 7",kind:"nl",steps:[
- {eq:"3x − 4 > 5",tip:"Two little puzzles! Let's do the first one.",r:[]},
- {eq:"3x > 9",tip:"Add 4 to both sides.",r:[]},
- {eq:"x > 3",tip:"9 split into 3 groups is 3. Empty dot on 3, color to the right.",r:[[3,"R",0]]},
- {eq:"1 − 2x ≥ 7",tip:"Now the second puzzle.",r:[[3,"R",0]]},
- {eq:"−2x ≥ 6",tip:"Take away 1 from both sides.",r:[[3,"R",0]]},
- {eq:"x <span class='flipper' id='flipme'>≥</span> −3",tip:"We divide by −2, a minus number. Watch the sign FLIP! That's the golden rule.",r:[[3,"R",0]],flip:1},
- {eq:"x ≤ −3 or x > 3",tip:"Filled dot on −3 going left, empty dot on 3 going right. Answer A! ⭐",r:[[3,"R",0],[-3,"L",1]]}]},
+ {eq:"3x − 4 > 5 <b>or</b> 1 − 2x ≥ 7",tip:"Two puzzles in one! The word \"or\" means x only has to fit one of them.",r:[]},
+ {eq:"<mark>3x − 4 > 5</mark>",tip:"Puzzle 1 first. We want x all by itself.",sc:["3x − 4",">","5"]},
+ {eq:"3x − 4 <mark>+ 4</mark> > 5 <mark>+ 4</mark>",tip:"Get rid of the minus 4. Add 4 to both sides to keep it fair.",sc:["3x − 4 + 4",">","5 + 4","+ 4"]},
+ {eq:"<mark>3x</mark> > <mark>9</mark>",tip:"Minus 4 and plus 4 make 0. And 5 + 4 = 9.",sc:["3x",">","9"]},
+ {eq:"3x <mark>÷ 3</mark> > 9 <mark>÷ 3</mark>",tip:"3x means 3 times x. Share both sides into 3 equal groups.",sc:["3x ÷ 3",">","9 ÷ 3","÷ 3"]},
+ {eq:"<mark>x > 3</mark>",tip:"9 shared into 3 groups is 3 each. So x is bigger than 3!",sc:["x",">","3"]},
+ {eq:"x > 3",tip:"Dot on 3. It's EMPTY because > means 3 itself doesn't count.",r:[[3,"",0]]},
+ {eq:"x > 3",tip:"Bigger numbers live on the right. Color to the right!",r:[[3,"R",0]]},
+ {eq:"<mark>1 − 2x ≥ 7</mark>",tip:"Now puzzle 2!",sc:["1 − 2x","≥","7"]},
+ {eq:"1 − 2x <mark>− 1</mark> ≥ 7 <mark>− 1</mark>",tip:"Get rid of the 1. Take away 1 from both sides.",sc:["1 − 2x − 1","≥","7 − 1","− 1"]},
+ {eq:"<mark>−2x</mark> ≥ <mark>6</mark>",tip:"1 take away 1 is 0. 7 take away 1 is 6.",sc:["−2x","≥","6"]},
+ {eq:"−2x <mark>÷ (−2)</mark> ≥ 6 <mark>÷ (−2)</mark>",tip:"Share both sides by −2. Uh oh! −2 is a minus number...",sc:["−2x ÷ (−2)","≥","6 ÷ (−2)","÷ (−2)"]},
+ {eq:"x <span class='flipper' id='flipme'>≥</span> −3",tip:"Golden rule: when you divide by a minus number, the sign FLIPS! Watch it flip! 🙃",sc:["x","≥","−3"],flip:"≤"},
+ {eq:"x ≤ −3",tip:"Dot on −3. It's FILLED because ≤ means −3 counts too.",r:[[3,"R",0],[-3,"",1]]},
+ {eq:"x ≤ −3",tip:"Smaller numbers live on the left. Color to the left!",r:[[3,"R",0],[-3,"L",1]]},
+ {eq:"x ≤ −3 <b>or</b> x > 3",tip:"Put both puzzles together. That's answer A! ⭐",r:[[3,"R",0],[-3,"L",1]]}]},
 {name:"Same line: ⅓x + 6",ask:"Graph y = ⅓x + 6 and y = ⅓x + 6",kind:"gr",lines:[{m:1/3,b:6,c:P},{m:1/3,b:6,c:G,twin:1}],steps:[
- {eq:"y = ⅓x + 6",tip:"Both equations are exactly the same. Hmm, interesting!",p:[],L:0},
- {eq:"y = ⅓(3) + 6",tip:"Let's try x = 3. We pick 3 because a third of 3 is easy: it's 1.",p:[],L:0},
- {eq:"y = 1 + 6 = 7",tip:"So our first dot is (3, 7). Go right 3, up 7.",p:[[3,7,P]],L:0},
- {eq:"y = ⅓(−3) + 6",tip:"Now try x = −3. A third of −3 is −1.",p:[[3,7,P]],L:0},
- {eq:"y = −1 + 6 = 5",tip:"Second dot is (−3, 5). Go left 3, up 5.",p:[[3,7,P],[-3,5,P]],L:0},
- {eq:"Join the dots",tip:"Draw a line through both dots. That's the purple line!",p:[[3,7,P],[-3,5,P]],L:1},
- {eq:"Green line: same dots",tip:"The green equation is the same, so it lands right on top. Twins!",p:[[3,7,G],[-3,5,G]],L:2},
- {eq:"Check: crosses at 6 ✓",tip:"The +6 tells us where it crosses the up-and-down line. It does!",p:[[3,7,G],[-3,5,G]],L:2,ring:[0,6]},
- {eq:"Consistent and dependent",tip:"Same line = answers everywhere. ⭐",p:[[3,7,G],[-3,5,G]],L:2,ring:[0,6]}]},
+ {eq:"y = ⅓x + 6",tip:"Look! Both lines have the exact same rule. Hmm, interesting!",p:[],L:0},
+ {eq:"We need 2 dots",tip:"To draw a line, we only need 2 dots. We pick an x, then work out y.",p:[],L:0},
+ {eq:"y = ⅓(<mark>3</mark>) + 6",tip:"Let's pick x = 3. Why 3? Because ⅓ of 3 is easy!",p:[],L:0},
+ {eq:"y = <mark>1</mark> + 6",tip:"⅓ of 3 is like sharing 3 cookies with 3 friends. Everyone gets 1! 🍪",p:[],L:0},
+ {eq:"y = <mark>7</mark>",tip:"1 + 6 = 7. So when x is 3, y is 7.",p:[],L:0},
+ {eq:"Dot at (3, 7)",tip:"Start in the middle. Walk right 3. Then climb up 7. Dot!",p:[[3,7,P]],L:0},
+ {eq:"y = ⅓(<mark>−3</mark>) + 6",tip:"Now pick x = −3. ⅓ of −3 is −1.",p:[[3,7,P]],L:0},
+ {eq:"y = −1 + 6 = <mark>5</mark>",tip:"−1 + 6 is the same as 6 take away 1. That's 5!",p:[[3,7,P]],L:0},
+ {eq:"Dot at (−3, 5)",tip:"Start in the middle. Minus means walk LEFT 3. Then climb up 5. Dot!",p:[[3,7,P],[-3,5,P]],L:0},
+ {eq:"Join the dots",tip:"Use a ruler to join the 2 dots. That's the purple line!",p:[[3,7,P],[-3,5,P]],L:1},
+ {eq:"Green line: same dots",tip:"The green rule is the same, so it gets the same dots. It lands right on top!",p:[[3,7,G],[-3,5,G]],L:2},
+ {eq:"Check: crosses at 6 ✓",tip:"The + 6 tells where the line crosses the up-and-down line. Look, it's at 6!",p:[[3,7,G],[-3,5,G]],L:2,ring:[0,6]},
+ {eq:"Consistent and dependent",tip:"Twin lines! Every dot on the line is an answer. ⭐",p:[[3,7,G],[-3,5,G]],L:2,ring:[0,6]}]},
 {name:"Same line: y = −x",ask:"Graph y = −x and y = −x",kind:"gr",lines:[{m:-1,b:0,c:P},{m:-1,b:0,c:G,twin:1}],steps:[
- {eq:"y = −x",tip:"y is always the opposite of x. Opposite means switch the sign.",p:[],L:0},
- {eq:"x = 2 → y = −2",tip:"The opposite of 2 is −2. Dot at (2, −2).",p:[[2,-2,P]],L:0},
- {eq:"x = −2 → y = 2",tip:"The opposite of −2 is 2. Dot at (−2, 2).",p:[[2,-2,P],[-2,2,P]],L:0},
- {eq:"Join the dots",tip:"The line slides down like a slide at the park.",p:[[2,-2,P],[-2,2,P]],L:1},
- {eq:"Green line: same dots",tip:"Same equation, same line. Twins again!",p:[[2,-2,G],[-2,2,G]],L:2},
- {eq:"Consistent and dependent",tip:"It goes through (0, 0) and the lines match. ⭐",p:[[2,-2,G],[-2,2,G]],L:2,ring:[0,0]}]},
+ {eq:"y = −x",tip:"This rule says: y is the opposite of x.",p:[],L:0},
+ {eq:"Opposite = flip the sign",tip:"The opposite of 2 is −2. The opposite of −2 is 2. Just flip the sign!",p:[],L:0},
+ {eq:"x = 2 → y = <mark>−2</mark>",tip:"Pick x = 2. The opposite of 2 is −2.",p:[],L:0},
+ {eq:"Dot at (2, −2)",tip:"Walk right 2. Minus means go DOWN 2. Dot!",p:[[2,-2,P]],L:0},
+ {eq:"x = −2 → y = <mark>2</mark>",tip:"Pick x = −2. The opposite of −2 is 2.",p:[[2,-2,P]],L:0},
+ {eq:"Dot at (−2, 2)",tip:"Walk left 2. Then climb up 2. Dot!",p:[[2,-2,P],[-2,2,P]],L:0},
+ {eq:"x = 0 → y = <mark>0</mark>",tip:"Pick x = 0. The opposite of 0 is just 0! That dot sits right in the middle.",p:[[2,-2,P],[-2,2,P],[0,0,P]],L:0},
+ {eq:"Join the dots",tip:"Join the dots. The line goes down like a slide at the park! 🛝",p:[[2,-2,P],[-2,2,P],[0,0,P]],L:1},
+ {eq:"Green line: same dots",tip:"Same rule, same dots, same line. Twins again!",p:[[2,-2,G],[-2,2,G],[0,0,G]],L:2},
+ {eq:"Consistent and dependent",tip:"The lines match all the way. Answers everywhere! ⭐",p:[[2,-2,G],[-2,2,G],[0,0,G]],L:2}]},
 {name:"Walls: x = 2, x = 10",ask:"Graph x = 2 and x = 10",kind:"gr",lines:[{vx:2,c:P},{vx:10,c:G}],steps:[
- {eq:"x = 2 and x = 10",tip:"No y here! So y can be anything. These lines stand up tall like walls.",p:[],L:0},
- {eq:"x = 2 → (2, 0), (2, 5)",tip:"x must be 2. Pick any y, like 0 and 5.",p:[[2,0,P],[2,5,P]],L:0},
- {eq:"Draw the wall at 2",tip:"Straight up and down through 2.",p:[[2,0,P],[2,5,P]],L:1},
- {eq:"x = 10 → (10, 0), (10, 5)",tip:"x must be 10. Pick y = 0 and 5 again.",p:[[2,0,P],[2,5,P],[10,0,G],[10,5,G]],L:1},
- {eq:"Draw the wall at 10",tip:"Another tall wall, this time at 10.",p:[[2,0,P],[2,5,P],[10,0,G],[10,5,G]],L:2},
- {eq:"Inconsistent",tip:"The walls are 8 apart and never touch. No answer. ⭐",p:[[2,0,P],[2,5,P],[10,0,G],[10,5,G]],L:2,gap:[2,-4,10,-4,"8 apart"]}]},
+ {eq:"x = 2 and x = 10",tip:"Wait... where is y? There's no y here!",p:[],L:0},
+ {eq:"No y = any y",tip:"No y means y can be ANY number. Only x has a rule.",p:[],L:0},
+ {eq:"x = 2 → (2, 0)",tip:"x must be 2. Walk right 2 and put a dot.",p:[[2,0,P,1]],L:0},
+ {eq:"x = 2 → (2, 5)",tip:"x is still 2. This time also climb up 5. Dot!",p:[[2,0,P,1],[2,5,P,1]],L:0},
+ {eq:"x = 2 → (2, −5)",tip:"x is still 2. Now go down 5. Dot!",p:[[2,0,P,1],[2,5,P,1],[2,-5,P,1]],L:0},
+ {eq:"Draw the wall at 2",tip:"Join them. The line stands up tall like a wall! 🧱",p:[[2,0,P,1],[2,5,P,1],[2,-5,P,1]],L:1},
+ {eq:"x = 10 → (10, 0)",tip:"Now x = 10. Walk right 10. Dot!",p:[[2,0,P,1],[2,5,P,1],[2,-5,P,1],[10,0,G]],L:1},
+ {eq:"x = 10 → (10, 5)",tip:"x is still 10. Climb up 5. Dot!",p:[[2,0,P,1],[2,5,P,1],[2,-5,P,1],[10,0,G],[10,5,G]],L:1},
+ {eq:"x = 10 → (10, −5)",tip:"x is still 10. Go down 5. Dot!",p:[[2,0,P,1],[2,5,P,1],[2,-5,P,1],[10,0,G],[10,5,G],[10,-5,G]],L:1},
+ {eq:"Draw the wall at 10",tip:"Join them. Another tall wall!",p:[[2,0,P,1],[2,5,P,1],[2,-5,P,1],[10,0,G],[10,5,G],[10,-5,G]],L:2},
+ {eq:"10 − 2 = <mark>8</mark>",tip:"How far apart are the walls? 10 take away 2 is 8.",p:[[2,0,P,1],[2,5,P,1],[2,-5,P,1],[10,0,G],[10,5,G],[10,-5,G]],L:2,gap:[2,-8,10,-8,"8 apart"]},
+ {eq:"Inconsistent",tip:"The walls never touch. So there's no answer. ⭐",p:[[2,0,P,1],[2,5,P,1],[2,-5,P,1],[10,0,G],[10,5,G],[10,-5,G]],L:2,gap:[2,-8,10,-8,"8 apart"]}]},
 {name:"Train tracks: 3x − 3, 3x − 8",ask:"Graph y = 3x − 3 and y = 3x − 8",kind:"gr",lines:[{m:3,b:-3,c:G},{m:3,b:-8,c:P}],steps:[
- {eq:"y = 3x − 3 and y = 3x − 8",tip:"Both have 3 in front of x. That means the same steepness.",p:[],L:0},
- {eq:"y = 3(0) − 3 = −3",tip:"Green line, x = 0: anything times 0 is 0. Dot at (0, −3).",p:[[0,-3,G]],L:0},
- {eq:"y = 3(2) − 3 = 3",tip:"x = 2: 3 times 2 is 6, take away 3 is 3. Dot at (2, 3).",p:[[0,-3,G],[2,3,G]],L:0},
- {eq:"Join the green dots",tip:"Up 3, right 1. Like climbing big stairs!",p:[[0,-3,G],[2,3,G]],L:1,rr:[0,-3,1,3]},
- {eq:"y = 3(0) − 8 = −8",tip:"Purple line, x = 0. Dot at (0, −8).",p:[[0,-3,G],[2,3,G],[0,-8,P]],L:1},
- {eq:"y = 3(2) − 8 = −2",tip:"x = 2: 6 take away 8 is −2. Dot at (2, −2).",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:1},
- {eq:"Join the purple dots",tip:"Same steepness as green. They lean the same way.",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:2},
- {eq:"Inconsistent",tip:"Like train tracks: 5 apart forever, never touching. No answer. ⭐",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:2,gap:[0.35,-3,0.35,-8,"5 apart"]}]}
+ {eq:"y = <mark>3</mark>x − 3 and y = <mark>3</mark>x − 8",tip:"Both rules have a 3 next to x. That 3 tells how steep the line is.",p:[],L:0},
+ {eq:"Same 3 = same steepness",tip:"Same number means both lines lean exactly the same way. Remember that!",p:[],L:0},
+ {eq:"y = 3(<mark>0</mark>) − 3",tip:"Green line first. Let's pick x = 0.",p:[],L:0},
+ {eq:"y = 0 − 3 = <mark>−3</mark>",tip:"Anything times 0 is 0. Then 0 take away 3 is −3.",p:[],L:0},
+ {eq:"Dot at (0, −3)",tip:"x is 0, so don't walk sideways. Just go down 3. Dot!",p:[[0,-3,G]],L:0},
+ {eq:"y = 3(<mark>2</mark>) − 3",tip:"Now pick x = 2. 3 times 2 is 6.",p:[[0,-3,G]],L:0},
+ {eq:"y = 6 − 3 = <mark>3</mark>",tip:"6 take away 3 is 3.",p:[[0,-3,G]],L:0},
+ {eq:"Dot at (2, 3)",tip:"Walk right 2. Climb up 3. Dot!",p:[[0,-3,G],[2,3,G]],L:0},
+ {eq:"Join the green dots",tip:"Join them with a ruler. There's the green line!",p:[[0,-3,G],[2,3,G]],L:1},
+ {eq:"Right 1, up 3",tip:"See the stairs? Go right 1 and the line climbs up 3. Big stairs!",p:[[0,-3,G],[2,3,G]],L:1,rr:[0,-3,1,3]},
+ {eq:"y = 3(0) − 8 = <mark>−8</mark>",tip:"Purple line now. x = 0 gives 0 take away 8. That's −8.",p:[[0,-3,G],[2,3,G]],L:1},
+ {eq:"Dot at (0, −8)",tip:"Don't walk sideways. Just go down 8. Dot!",p:[[0,-3,G],[2,3,G],[0,-8,P]],L:1},
+ {eq:"y = 3(2) − 8 = <mark>−2</mark>",tip:"x = 2: 3 times 2 is 6. 6 take away 8 is −2.",p:[[0,-3,G],[2,3,G],[0,-8,P]],L:1},
+ {eq:"Dot at (2, −2)",tip:"Walk right 2. Go down 2. Dot!",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:1},
+ {eq:"Join the purple dots",tip:"Join them. Look! It leans the same way as green.",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:2},
+ {eq:"−3 and −8: <mark>5</mark> apart",tip:"The lines stay 5 apart forever and ever.",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:2,gap:[0.35,-3,0.35,-8,"5 apart"]},
+ {eq:"Inconsistent",tip:"Like train tracks, they never touch. No answer. ⭐ 🚂",p:[[0,-3,G],[2,3,G],[0,-8,P],[2,-2,P]],L:2,gap:[0.35,-3,0.35,-8,"5 apart"]}]}
 ];
 
 const $=id=>document.getElementById(id);
 const pic=$('pic');
-let L=0,i=0,timer=null;
+const FONT='font-family="Nunito,system-ui" font-weight="800"';
+let L=0,i=0,timer=null,talk=false;
 
 // chips
 LESSONS.forEach((l,k)=>{const b=document.createElement('button');b.className='chip';b.textContent=l.name;
@@ -202,15 +266,37 @@ LESSONS.forEach((l,k)=>{const b=document.createElement('button');b.className='ch
 
 function grow(){requestAnimationFrame(()=>requestAnimationFrame(()=>pic.querySelectorAll('.grow').forEach(e=>e.style.strokeDashoffset=0)))}
 
+// balance scale: whatever we do to one side, we do to the other
+function scale(sc,anim,flip){
+ const[l,sg,r,act]=sc;
+ pic.setAttribute('viewBox','0 0 360 200');
+ const fs=t=>Math.min(22,Math.floor(230/Math.max(4,t.length)));
+ const pan=(cx,t,cls)=>{let g=`<g class="${cls}">`;
+  g+=`<line x1="${cx}" y1="50" x2="${cx-70}" y2="150" stroke="var(--axis)" stroke-width="2"/><line x1="${cx}" y1="50" x2="${cx+70}" y2="150" stroke="var(--axis)" stroke-width="2"/>`;
+  g+=`<path d="M${cx-75} 150 H${cx+75} Q${cx+60} 172 ${cx} 172 Q${cx-60} 172 ${cx-75} 150Z" fill="var(--grid)" stroke="var(--ink)" stroke-width="2.5"/>`;
+  g+=`<g class="${anim?'fade':''}"><rect x="${cx-68}" y="106" width="136" height="40" rx="10" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>`;
+  g+=`<text x="${cx}" y="${133-(22-fs(t))/2}" text-anchor="middle" font-size="${fs(t)}" font-weight="700" fill="var(--ink)" font-family="'Baloo 2',system-ui">${t}</text></g>`;
+  if(act){const w=26+act.length*11;
+   g+=`<g class="${anim?'drop':''}"><rect x="${cx-w/2}" y="62" width="${w}" height="28" rx="14" fill="var(--sun)" stroke="var(--ink)" stroke-width="2.5"/><text x="${cx}" y="82" text-anchor="middle" font-size="17" fill="var(--sunInk)" ${FONT}>${act}</text></g>`}
+  return g+'</g>'};
+ const w=anim&&act;
+ let s=`<rect x="140" y="182" width="80" height="12" rx="6" fill="var(--ink)"/><line x1="180" y1="50" x2="180" y2="184" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/>`;
+ s+=`<line class="${w?'wob':''}" x1="75" y1="50" x2="285" y2="50" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/>`;
+ s+=pan(90,l,w?'bobL':'')+pan(270,r,w?'bobR':'');
+ s+=`<circle cx="180" cy="50" r="22" fill="var(--sun)" stroke="var(--ink)" stroke-width="3"/><text ${flip?'id="sflip" class="flipper" style="transform-box:fill-box;transform-origin:center"':''} x="180" y="59" text-anchor="middle" font-size="26" fill="var(--sunInk)" ${FONT}>${sg}</text>`;
+ pic.innerHTML=s;
+}
+
 // number line
 const NX=v=>30+(v+5)*30;
-function numline(rays,anim){
+function numline(rays,prev,anim){
  pic.setAttribute('viewBox','0 0 360 80');
  let s=`<line x1="10" y1="34" x2="350" y2="34" stroke="var(--axis)" stroke-width="2.5"/><path d="M8 34 l10 -6 v12z M352 34 l-10 -6 v12z" fill="var(--axis)"/>`;
- for(let v=-5;v<=5;v++)s+=`<line x1="${NX(v)}" y1="27" x2="${NX(v)}" y2="41" stroke="var(--axis)" stroke-width="2"/><text x="${NX(v)}" y="64" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)" font-family="Nunito,system-ui">${v}</text>`;
- rays.forEach((r,j)=>{const x0=NX(r[0]),x1=r[1]==="L"?14:346,len=Math.abs(x1-x0),a=anim&&j===rays.length-1;
-  s+=`<line class="${a?'grow':''}" x1="${x0}" y1="34" x2="${x1}" y2="34" stroke="var(--grape)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${len}" stroke-dashoffset="${a?len:0}" style="transition:stroke-dashoffset 1s ease"/>`;
-  s+=`<circle cx="${x0}" cy="34" r="9" stroke="var(--grape)" stroke-width="4" fill="${r[2]?'var(--grape)':'var(--card)'}"/>`});
+ for(let v=-5;v<=5;v++)s+=`<line x1="${NX(v)}" y1="27" x2="${NX(v)}" y2="41" stroke="var(--axis)" stroke-width="2"/><text x="${NX(v)}" y="64" text-anchor="middle" font-size="15" fill="var(--ink)" ${FONT}>${v}</text>`;
+ rays.forEach((r,j)=>{const x0=NX(r[0]),old=prev[j]&&prev[j][0]===r[0]?prev[j]:null;
+  if(r[1]){const x1=r[1]==="L"?14:346,len=Math.abs(x1-x0),a=anim&&!(old&&old[1]);
+   s+=`<line class="${a?'grow':''}" x1="${x0}" y1="34" x2="${x1}" y2="34" stroke="var(--grape)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${len}" stroke-dashoffset="${a?len:0}" style="transition:stroke-dashoffset 1.2s ease"/>`}
+  s+=`<circle class="${anim&&!old?'pop':''}" cx="${x0}" cy="34" r="9" stroke="var(--grape)" stroke-width="4" fill="${r[2]?'var(--grape)':'var(--card)'}"/>`});
  pic.innerHTML=s;if(anim)grow();
 }
 
@@ -221,10 +307,12 @@ function lineEl(l,anim){
  if(l.vx!==undefined){x1=x2=gx(l.vx);y1=gy(-10);y2=gy(10)}
  else{x1=gx(-12);y1=gy(l.m*-12+l.b);x2=gx(12);y2=gy(l.m*12+l.b)}
  const len=Math.hypot(x2-x1,y2-y1);
- if(l.twin)return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${l.c}" stroke-width="3.5" stroke-dasharray="9 7" stroke-linecap="round"/>`;
+ if(l.twin)return `<line class="${anim?'fade':''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${l.c}" stroke-width="3.5" stroke-dasharray="9 7" stroke-linecap="round"/>`;
  return `<line class="${anim?'grow':''}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${l.c}" stroke-width="${l.vx!==undefined?5:7}" stroke-linecap="round" stroke-dasharray="${len}" stroke-dashoffset="${anim?len:0}" style="transition:stroke-dashoffset 1.2s ease"/>`;
 }
-function graph(les,st,anim,prevL){
+const lbl=(x,y,anchor,t,cls,d,color)=>`<text class="${cls}" style="--d:${d}s" x="${x}" y="${y}" text-anchor="${anchor}" font-size="14" fill="${color||'var(--ink)'}" ${FONT} paint-order="stroke" stroke="var(--card)" stroke-width="4">${t}</text>`;
+function graph(les,st,anim,prevSt){
+ const prevL=prevSt?prevSt.L:0,had=(prevSt?prevSt.p:[]).map(q=>q[0]+','+q[1]);
  pic.setAttribute('viewBox','0 0 340 340');
  let s='<defs><clipPath id="cp"><rect x="20" y="20" width="300" height="300"/></clipPath></defs>';
  for(let v=-10;v<=10;v++)s+=`<line x1="${gx(v)}" y1="20" x2="${gx(v)}" y2="320" stroke="var(--grid)" stroke-width="${v%2?1:1.6}"/><line x1="20" y1="${gy(v)}" x2="320" y2="${gy(v)}" stroke="var(--grid)" stroke-width="${v%2?1:1.6}"/>`;
@@ -233,24 +321,41 @@ function graph(les,st,anim,prevL){
  s+='<g clip-path="url(#cp)">';
  les.lines.forEach((l,k)=>{if(st.L>k)s+=lineEl(l,anim&&prevL<=k)});
  s+='</g>';
- if(st.rr){const[x,y,run,rise]=st.rr;s+=`<path d="M${gx(x)} ${gy(y)} V${gy(y+rise)} H${gx(x+run)}" fill="none" stroke="var(--flip)" stroke-width="3" stroke-dasharray="5 4"/><text x="${gx(x)-8}" y="${gy(y+rise/2)+4}" text-anchor="end" font-size="14" font-weight="800" fill="var(--flip)" font-family="Nunito,system-ui">up ${rise}</text><text x="${gx(x+run/2)}" y="${gy(y+rise)-8}" text-anchor="middle" font-size="14" font-weight="800" fill="var(--flip)" font-family="Nunito,system-ui">right ${run}</text>`}
- if(st.gap){const[a,b,c,d,t]=st.gap;s+=`<line x1="${gx(a)}" y1="${gy(b)}" x2="${gx(c)}" y2="${gy(d)}" stroke="var(--flip)" stroke-width="3" stroke-dasharray="5 4"/><text x="${a===c?gx(a)+8:gx((a+c)/2)}" y="${a===c?gy((b+d)/2)+5:gy(b)-10}" text-anchor="${a===c?'start':'middle'}" font-size="15" font-weight="800" fill="var(--flip)" font-family="Nunito,system-ui">${t}</text>`}
- if(st.ring)s+=`<circle cx="${gx(st.ring[0])}" cy="${gy(st.ring[1])}" r="13" fill="none" stroke="var(--flip)" stroke-width="3"/>`;
- st.p.forEach(q=>{const left=q[0]<=0&&!(q[0]===0&&q[1]<0&&false);
-  s+=`<circle cx="${gx(q[0])}" cy="${gy(q[1])}" r="8" fill="${q[2]}" stroke="var(--card)" stroke-width="2.5"/>`;
-  s+=`<text x="${gx(q[0])+(q[0]<0?-12:12)}" y="${gy(q[1])+(q[0]===0?5:-10)}" text-anchor="${q[0]<0?'end':'start'}" font-size="14" font-weight="800" fill="var(--ink)" font-family="Nunito,system-ui" paint-order="stroke" stroke="var(--card)" stroke-width="4">(${q[0]}, ${q[1]})</text>`});
+ if(st.rr){const[x,y,run,rise]=st.rr,c=anim&&!(prevSt&&prevSt.rr)?'fade':'';s+=`<g class="${c}"><path d="M${gx(x)} ${gy(y)} H${gx(x+run)} V${gy(y+rise)}" fill="none" stroke="var(--flip)" stroke-width="3" stroke-dasharray="5 4"/>${lbl(gx(x+run/2),gy(y)+18,'middle','right '+run,'',0,'var(--flip)')}${lbl(gx(x+run)+8,gy(y+rise/2)+5,'start','up '+rise,'',0,'var(--flip)')}</g>`}
+ if(st.gap){const[a,b,c,d,t]=st.gap,f=anim&&!(prevSt&&prevSt.gap)?'fade':'';s+=`<g class="${f}"><line x1="${gx(a)}" y1="${gy(b)}" x2="${gx(c)}" y2="${gy(d)}" stroke="var(--flip)" stroke-width="3" stroke-dasharray="5 4"/>${lbl(a===c?gx(a)+8:gx((a+c)/2),a===c?gy((b+d)/2)+5:gy(b)-10,a===c?'start':'middle',t,'',0,'var(--flip)')}</g>`}
+ if(st.ring)s+=`<circle class="${anim&&!(prevSt&&prevSt.ring)?'pop':''}" cx="${gx(st.ring[0])}" cy="${gy(st.ring[1])}" r="13" fill="none" stroke="var(--flip)" stroke-width="3"/>`;
+ // new dots: walk from the middle (right/left first, then up/down), then the dot pops in
+ st.p.forEach(q=>{const[x,y]=q;if(had.includes(x+','+y))return;
+  const len=Math.abs(gx(x)-170)+Math.abs(gy(y)-170);if(!len)return;
+  s+=`<path class="${anim?'grow':''}" d="M170 170 H${gx(x)} V${gy(y)}" fill="none" stroke="var(--flip)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${len}" stroke-dashoffset="${anim?len:0}" style="transition:stroke-dashoffset 1.1s linear"/>`;
+  if(x)s+=lbl(gx(x/2),162,'middle',(x>0?'right ':'left ')+Math.abs(x),anim?'fade':'',.2,'var(--flip)');
+  if(y){const inside=x>=7||x<0;s+=lbl(gx(x)+(inside?-8:8),gy(y/2)+5,inside?'end':'start',(y>0?'up ':'down ')+Math.abs(y),anim?'fade':'',.7,'var(--flip)')}});
+ st.p.forEach(q=>{const[x,y,c,lft]=q,isNew=anim&&!had.includes(x+','+y),cls=isNew?'pop':'';
+  const left=lft||x<0||x>=7,dy=y===0?-22:(x===0?5:-10);
+  s+=`<circle class="${cls}" style="--d:1.1s" cx="${gx(x)}" cy="${gy(y)}" r="8" fill="${c}" stroke="var(--card)" stroke-width="2.5"/>`;
+  s+=lbl(gx(x)+(left?-12:12),gy(y)+dy,left?'end':'start',`(${x}, ${y})`,isNew?'fade':'',1.1)});
  pic.innerHTML=s;if(anim)grow();
 }
+
+// read aloud
+const SAY=[[/−/g,' minus '],[/≤/g,' less than or equal to '],[/≥/g,' greater than or equal to '],[/</g,' less than '],[/>/g,' greater than '],[/⅓/g,' one third '],[/÷/g,' divided by '],[/\((-?\d+), (-?\d+)\)/g,' $1 comma $2 '],[/[⭐✓🍎🍪🙃🛝🧱🚂]/gu,'']];
+function say(t){if(!talk||!('speechSynthesis' in window))return;speechSynthesis.cancel();
+ SAY.forEach(([a,b])=>t=t.replace(a,b));const u=new SpeechSynthesisUtterance(t);u.rate=.9;u.pitch=1.1;speechSynthesis.speak(u)}
+if(!('speechSynthesis' in window))$('talk').hidden=true;
+$('talk').onclick=()=>{talk=!talk;$('talk').setAttribute('aria-pressed',talk);if(talk)say(LESSONS[L].steps[i].tip);else speechSynthesis.cancel()};
 
 function render(anim){
  const les=LESSONS[L],S=les.steps,st=S[i],eq=$('eq');
  $('ask').textContent=les.ask;
  eq.classList.add('out');
  setTimeout(()=>{eq.innerHTML=st.eq;$('tip').textContent=st.tip;eq.classList.remove('out');
-  if(st.flip)setTimeout(()=>{const f=$('flipme');if(!f)return;f.style.transform='rotateY(90deg) scale(1.4)';setTimeout(()=>{f.textContent='≤';f.style.transform='rotateY(0) scale(1.4)'},230)},900)},anim?200:0);
- if(les.kind==='nl'){const prev=i>0?S[i-1].r.length:0;numline(st.r,anim&&st.r.length>prev)}
- else graph(les,st,anim,i>0?S[i-1].L:0);
+  if(st.flip)setTimeout(()=>{['flipme','sflip'].forEach(id=>{const f=$(id);if(!f)return;f.style.transition='transform .45s';f.style.transform='rotateY(90deg) scale(1.4)';setTimeout(()=>{f.textContent=st.flip;f.style.transform='rotateY(0) scale(1.4)'},230)})},900)},anim?200:0);
+ say(st.tip);
+ if(st.sc)scale(st.sc,anim,st.flip);
+ else if(st.r){let k=i-1;while(k>=0&&!S[k].r)k--;numline(st.r,k>=0?S[k].r:[],anim)}
+ else graph(les,st,anim,i>0?S[i-1]:null);
  $('dots').innerHTML=S.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('');
+ $('count').textContent=`Step ${i+1} of ${S.length}`;
  $('back').disabled=i===0;$('next').disabled=i===S.length-1;
 }
 function stop(){clearInterval(timer);timer=null;$('play').textContent='Play'}
@@ -260,7 +365,7 @@ $('back').onclick=()=>{stop();if(i>0){i--;render(false)}};
 $('play').onclick=()=>{if(timer){stop();return}
  if(i>=LESSONS[L].steps.length-1){i=0;render(true)}
  $('play').textContent='Pause';
- timer=setInterval(()=>{if(i<LESSONS[L].steps.length-1){i++;render(true)}else stop()},2800)};
+ timer=setInterval(()=>{if(i<LESSONS[L].steps.length-1){i++;render(true)}else stop()},talk?7000:5000)};
 render(false);
 </script>
 </body>
