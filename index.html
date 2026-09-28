@@ -262,6 +262,40 @@ const LESSONS=[
  {eq:"Draw the floor at −3",tip:"Join them. Another flat floor, just below the first one.",p:[[0,-1,P,"b"],[4,-1,P,"b"],[-4,-1,P,"b"],[0,-3,G,"b"],[4,-3,G,"b"],[-4,-3,G,"b"]],L:2},
  {eq:"From −1 to −3 = <mark>2</mark>",tip:"How far apart? Count the steps down from −1 to −3. That's 2!",p:[[0,-1,P,"b"],[4,-1,P,"b"],[-4,-1,P,"b"],[0,-3,G,"b"],[4,-3,G,"b"],[-4,-3,G,"b"]],L:2,gap:[-8,-1,-8,-3,"2 apart"]},
  {eq:"Inconsistent",tip:"The floors never touch. So there's no answer. ⭐",p:[[0,-1,P,"b"],[4,-1,P,"b"],[-4,-1,P,"b"],[0,-3,G,"b"],[4,-3,G,"b"],[-4,-3,G,"b"]],L:2,gap:[-8,-1,-8,-3,"2 apart"]}]},
+{name:"Messy one: x − y = 2",ask:"Graph x − y = 2 and y = x + 5",kind:"gr",lines:[{m:1,b:-2,c:P},{m:1,b:5,c:G}],steps:[
+ {eq:"x − y = 2 and y = x + 5",tip:"Two rules! The first one looks messy. Let's tidy it so it says y = something.",p:[],L:0},
+ {eq:"x − y = 2",tip:"We want y all alone on one side. Let's use our balance scale!",sc:["x − y","=","2"]},
+ {eq:"x − y <mark>− x</mark> = 2 <mark>− x</mark>",tip:"Take away x from both sides. Both sides must stay fair!",sc:["x − y − x","=","2 − x","− x"]},
+ {eq:"<mark>−y</mark> = 2 − x",tip:"x take away x is nothing. Poof! Now we have minus y.",sc:["−y","=","2 − x"]},
+ {eq:"<mark>y = x − 2</mark>",tip:"Minus y is the opposite of y. So we flip the signs on BOTH sides. 2 becomes −2, and −x becomes x.",sc:["y","=","x − 2"]},
+ {eq:"y = <mark>2</mark> − 2 = 0",tip:"Tidy! Now pick x = 2. 2 take away 2 is 0.",p:[],L:0},
+ {eq:"Dot at (2, 0)",tip:"Walk RIGHT 2. y is 0, so no climbing. Dot! Careful: it's 2, not −2.",p:[[2,0,P]],L:0},
+ {eq:"y = <mark>5</mark> − 2 = 3",tip:"Pick x = 5. 5 take away 2 is 3.",p:[[2,0,P]],L:0},
+ {eq:"Dot at (5, 3)",tip:"Walk right 5. Climb up 3. Dot!",p:[[2,0,P],[5,3,P]],L:0},
+ {eq:"Join the purple dots",tip:"Join them with a ruler. There's the purple line!",p:[[2,0,P],[5,3,P]],L:1},
+ {eq:"y = <mark>0</mark> + 5 = 5",tip:"Green line: y = x + 5. Pick x = 0. 0 + 5 is 5.",p:[[2,0,P],[5,3,P]],L:1},
+ {eq:"Dot at (0, 5)",tip:"Don't walk sideways. Just climb up 5. Dot!",p:[[2,0,P],[5,3,P],[0,5,G]],L:1},
+ {eq:"y = <mark>−5</mark> + 5 = 0",tip:"Pick x = −5. −5 + 5 is 0!",p:[[2,0,P],[5,3,P],[0,5,G]],L:1},
+ {eq:"Dot at (−5, 0)",tip:"Walk LEFT 5. No climbing. Dot!",p:[[2,0,P],[5,3,P],[0,5,G],[-5,0,G]],L:1},
+ {eq:"Join the green dots",tip:"Join them. Look! It leans the same way as purple.",p:[[2,0,P],[5,3,P],[0,5,G],[-5,0,G]],L:2},
+ {eq:"Right 1, up 1",tip:"Both rules have just x. That means 1x. Go right 1, climb up 1. Same stairs!",p:[[2,0,P],[5,3,P],[0,5,G],[-5,0,G]],L:2,rr:[2,0,1,1]},
+ {eq:"<mark>7</mark> apart",tip:"The lines stay 7 apart forever. −2 up to 5 is 7 steps.",p:[[2,0,P],[5,3,P],[0,5,G],[-5,0,G]],L:2,gap:[-3,2,-3,-5,"7 apart"]},
+ {eq:"Inconsistent",tip:"Like train tracks, they never touch. No answer. ⭐ 🚂",p:[[2,0,P],[5,3,P],[0,5,G],[-5,0,G]],L:2,gap:[-3,2,-3,-5,"7 apart"]}]},
+{name:"Train tracks: x + 1, x + 8",ask:"Graph y = x + 1 and y = x + 8",kind:"gr",lines:[{m:1,b:1,c:P},{m:1,b:8,c:G}],steps:[
+ {eq:"y = x + 1 and y = x + 8",tip:"Both rules have just x. That's the same as 1x. Same number means same steepness!",p:[],L:0},
+ {eq:"y = <mark>0</mark> + 1 = 1",tip:"Purple line first. Pick x = 0. 0 + 1 is 1.",p:[],L:0},
+ {eq:"Dot at (0, 1)",tip:"Don't walk sideways. Just climb up 1. Dot!",p:[[0,1,P]],L:0},
+ {eq:"y = <mark>3</mark> + 1 = 4",tip:"Pick x = 3. 3 + 1 is 4.",p:[[0,1,P]],L:0},
+ {eq:"Dot at (3, 4)",tip:"Walk right 3. Climb up 4. Dot!",p:[[0,1,P],[3,4,P]],L:0},
+ {eq:"Join the purple dots",tip:"Join them with a ruler. There's the purple line!",p:[[0,1,P],[3,4,P]],L:1},
+ {eq:"Right 1, up 1",tip:"Go right 1, climb up 1. Little stairs!",p:[[0,1,P],[3,4,P]],L:1,rr:[0,1,1,1]},
+ {eq:"y = <mark>0</mark> + 8 = 8",tip:"Green line: y = x + 8. Pick x = 0. 0 + 8 is 8.",p:[[0,1,P],[3,4,P]],L:1},
+ {eq:"Dot at (0, 8)",tip:"Don't walk sideways. Just climb up 8. Dot!",p:[[0,1,P],[3,4,P],[0,8,G]],L:1},
+ {eq:"y = <mark>−3</mark> + 8 = 5",tip:"Pick x = −3. −3 + 8 is the same as 8 take away 3. That's 5!",p:[[0,1,P],[3,4,P],[0,8,G]],L:1},
+ {eq:"Dot at (−3, 5)",tip:"Walk LEFT 3. Climb up 5. Dot!",p:[[0,1,P],[3,4,P],[0,8,G],[-3,5,G]],L:1},
+ {eq:"Join the green dots",tip:"Join them. It leans the same way as purple!",p:[[0,1,P],[3,4,P],[0,8,G],[-3,5,G]],L:2},
+ {eq:"1 and 8: <mark>7</mark> apart",tip:"The lines stay 7 apart forever. 8 take away 1 is 7.",p:[[0,1,P],[3,4,P],[0,8,G],[-3,5,G]],L:2,gap:[-5,3,-5,-4,"7 apart"]},
+ {eq:"Inconsistent",tip:"Like train tracks, they never touch. No answer. ⭐ 🚂",p:[[0,1,P],[3,4,P],[0,8,G],[-3,5,G]],L:2,gap:[-5,3,-5,-4,"7 apart"]}]},
 {name:"Train tracks: 3x − 3, 3x − 8",ask:"Graph y = 3x − 3 and y = 3x − 8",kind:"gr",lines:[{m:3,b:-3,c:G},{m:3,b:-8,c:P}],steps:[
  {eq:"y = <mark>3</mark>x − 3 and y = <mark>3</mark>x − 8",tip:"Both rules have a 3 next to x. That 3 tells how steep the line is.",p:[],L:0},
  {eq:"Same 3 = same steepness",tip:"Same number means both lines lean exactly the same way. Remember that!",p:[],L:0},
@@ -382,7 +416,7 @@ function render(anim){
  say(st.tip);
  if(st.sc)scale(st.sc,anim,st.flip);
  else if(st.r){let k=i-1;while(k>=0&&!S[k].r)k--;numline(st.r,k>=0?S[k].r:[],anim)}
- else graph(les,st,anim,i>0?S[i-1]:null);
+ else{let k=i-1;while(k>=0&&!S[k].p)k--;graph(les,st,anim,k>=0?S[k]:null)}
  $('dots').innerHTML=S.map((_,k)=>`<i class="${k<=i?'on':''}"></i>`).join('');
  $('count').textContent=`Step ${i+1} of ${S.length}`;
  $('back').disabled=i===0;$('next').disabled=i===S.length-1;
