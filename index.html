@@ -296,6 +296,23 @@ const LESSONS=[
  {eq:"Join the green dots",tip:"Join them. It leans the same way as purple!",p:[[0,1,P],[3,4,P],[0,8,G],[-3,5,G]],L:2},
  {eq:"1 and 8: <mark>7</mark> apart",tip:"The lines stay 7 apart forever. 8 take away 1 is 7.",p:[[0,1,P],[3,4,P],[0,8,G],[-3,5,G]],L:2,gap:[-5,3,-5,-4,"7 apart"]},
  {eq:"Inconsistent",tip:"Like train tracks, they never touch. No answer. ⭐ 🚂",p:[[0,1,P],[3,4,P],[0,8,G],[-3,5,G]],L:2,gap:[-5,3,-5,-4,"7 apart"]}]},
+{name:"Crossing: −2x − 2 and 6",ask:"Graph y = −2x − 2 and y = 6",kind:"gr",lines:[{m:-2,b:-2,c:P},{hy:6,c:G}],steps:[
+ {eq:"y = −2x − 2 and y = 6",tip:"One slanty line and one flat floor. Let's draw them and see what happens!",p:[],L:0},
+ {eq:"y = −2(<mark>0</mark>) − 2",tip:"Purple line first. Pick x = 0. −2 times 0 is 0.",p:[],L:0},
+ {eq:"y = 0 − 2 = <mark>−2</mark>",tip:"0 take away 2 is −2.",p:[],L:0},
+ {eq:"Dot at (0, −2)",tip:"Don't walk sideways. Go down 2. Dot!",p:[[0,-2,P]],L:0},
+ {eq:"y = −2(<mark>−1</mark>) − 2",tip:"Pick x = −1. −2 times −1: two minus signs make a plus! That's 2.",p:[[0,-2,P]],L:0},
+ {eq:"y = 2 − 2 = <mark>0</mark>",tip:"2 take away 2 is 0.",p:[[0,-2,P]],L:0},
+ {eq:"Dot at (−1, 0)",tip:"Walk LEFT 1. y is 0, so no climbing. Dot!",p:[[0,-2,P],[-1,0,P]],L:0},
+ {eq:"Join the purple dots",tip:"Join them. The line goes down as you walk right, like a slide! 🛝",p:[[0,-2,P],[-1,0,P]],L:1},
+ {eq:"Right 1, down 2",tip:"The −2 in front of x means: go right 1, slide DOWN 2.",p:[[0,-2,P],[-1,0,P]],L:1,rr:[1,-4,1,-2]},
+ {eq:"y = 6",tip:"Green line: y = 6. There's no x, so x can be anything. It's a flat floor at 6!",p:[[0,-2,P],[-1,0,P]],L:1},
+ {eq:"Dot at (0, 6)",tip:"Don't walk sideways. Climb up 6. Dot!",p:[[0,-2,P],[-1,0,P],[0,6,G]],L:1},
+ {eq:"Dot at (5, 6)",tip:"Walk right 5. Climb up 6. Dot!",p:[[0,-2,P],[-1,0,P],[0,6,G],[5,6,G]],L:1},
+ {eq:"Join the green dots",tip:"Join them. Flat like a floor!",p:[[0,-2,P],[-1,0,P],[0,6,G],[5,6,G]],L:2},
+ {eq:"They cross at <mark>(−4, 6)</mark>",tip:"Look! The lines CROSS. Walk left 4, climb up 6. That's the spot!",p:[[0,-2,P],[-1,0,P],[0,6,G],[5,6,G],[-4,6,'var(--flip)']],L:2,ring:[-4,6]},
+ {eq:"−2(−4) − 2 = 8 − 2 = <mark>6</mark> ✓",tip:"Let's check. −2 times −4 is 8. 8 take away 2 is 6. Yes, it works!",p:[[0,-2,P],[-1,0,P],[0,6,G],[5,6,G],[-4,6,'var(--flip)']],L:2,ring:[-4,6]},
+ {eq:"Consistent and independent",tip:"They cross at just one spot. One answer: (−4, 6)! ⭐",p:[[0,-2,P],[-1,0,P],[0,6,G],[5,6,G],[-4,6,'var(--flip)']],L:2,ring:[-4,6]}]},
 {name:"Train tracks: 3x − 3, 3x − 8",ask:"Graph y = 3x − 3 and y = 3x − 8",kind:"gr",lines:[{m:3,b:-3,c:G},{m:3,b:-8,c:P}],steps:[
  {eq:"y = <mark>3</mark>x − 3 and y = <mark>3</mark>x − 8",tip:"Both rules have a 3 next to x. That 3 tells how steep the line is.",p:[],L:0},
  {eq:"Same 3 = same steepness",tip:"Same number means both lines lean exactly the same way. Remember that!",p:[],L:0},
@@ -383,7 +400,7 @@ function graph(les,st,anim,prevSt){
  s+='<g clip-path="url(#cp)">';
  les.lines.forEach((l,k)=>{if(st.L>k)s+=lineEl(l,anim&&prevL<=k)});
  s+='</g>';
- if(st.rr){const[x,y,run,rise]=st.rr,c=anim&&!(prevSt&&prevSt.rr)?'fade':'';s+=`<g class="${c}"><path d="M${gx(x)} ${gy(y)} H${gx(x+run)} V${gy(y+rise)}" fill="none" stroke="var(--flip)" stroke-width="3" stroke-dasharray="5 4"/>${lbl(gx(x+run/2),gy(y)+18,'middle','right '+run,'',0,'var(--flip)')}${lbl(gx(x+run)+8,gy(y+rise/2)+5,'start','up '+rise,'',0,'var(--flip)')}</g>`}
+ if(st.rr){const[x,y,run,rise]=st.rr,c=anim&&!(prevSt&&prevSt.rr)?'fade':'';s+=`<g class="${c}"><path d="M${gx(x)} ${gy(y)} H${gx(x+run)} V${gy(y+rise)}" fill="none" stroke="var(--flip)" stroke-width="3" stroke-dasharray="5 4"/>${lbl(gx(x+run/2),gy(y)+(rise<0?-8:18),'middle','right '+run,'',0,'var(--flip)')}${lbl(gx(x+run)+8,gy(y+rise/2)+5,'start',(rise<0?'down ':'up ')+Math.abs(rise),'',0,'var(--flip)')}</g>`}
  if(st.gap){const[a,b,c,d,t]=st.gap,f=anim&&!(prevSt&&prevSt.gap)?'fade':'';s+=`<g class="${f}"><line x1="${gx(a)}" y1="${gy(b)}" x2="${gx(c)}" y2="${gy(d)}" stroke="var(--flip)" stroke-width="3" stroke-dasharray="5 4"/>${lbl(a===c?gx(a)+8:gx((a+c)/2),a===c?gy((b+d)/2)+5:gy(b)-10,a===c?'start':'middle',t,'',0,'var(--flip)')}</g>`}
  if(st.ring)s+=`<circle class="${anim&&!(prevSt&&prevSt.ring)?'pop':''}" cx="${gx(st.ring[0])}" cy="${gy(st.ring[1])}" r="13" fill="none" stroke="var(--flip)" stroke-width="3"/>`;
  // new dots: walk from the middle (right/left first, then up/down), then the dot pops in
